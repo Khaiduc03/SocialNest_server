@@ -1,0 +1,32 @@
+version: '3.9'
+
+services:
+    postgres:
+        image: postgres
+        container_name: news
+        ports:
+            - '5432:5432'
+        environment:
+            POSTGRES_HOST: postgres
+            POSTGRES_USER: vip
+            POSTGRES_PASSWORD: vip
+            POSTGRES_DB: news_api
+        volumes:
+           - postgres_data:/var/lib/postgresql/data
+
+    nestjs:
+        build: .
+        command: yarn dev
+        volumes:
+            - .:/app
+        ports:
+            - '3000:3000'
+        depends_on:
+            - postgres
+        environment:
+            POSTGRES_HOST: postgres
+            POSTGRES_USER: vip
+            POSTGRES_PASSWORD: vip
+            POSTGRES_DB: news_api
+volumes:
+    postgres_data:
