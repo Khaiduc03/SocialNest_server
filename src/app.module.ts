@@ -4,38 +4,64 @@ import { AuthModule } from './auth/auth.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CacheConfigService, TypeOrmService } from './configs';
 import { CacheInterceptor, CacheModule } from '@nestjs/cache-manager';
-import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
-import { RolesGuard } from './core/guards';
+
+import {
+    BookmarkModule,
+    CommentModule,
+    FavoriteModule,
+    FollowsModule,
+    ImageModule,
+    NewsModule,
+    ReCommentModule,
+    TopicModule,
+    UserModule,
+} from './modules';
 
 @Module({
     imports: [
-        AuthModule,
         TypeOrmModule.forRootAsync({
             useClass: TypeOrmService,
         }),
 
         CacheModule.registerAsync({
-            useClass: CacheConfigService
+            useClass: CacheConfigService,
         }),
+
+        AuthModule,
+
+        UserModule,
+
+        ImageModule,
+
+        FollowsModule,
+
+        NewsModule,
+
+        TopicModule,
+
+        BookmarkModule,
+
+        CommentModule,
+
+        ReCommentModule,
+
+        FavoriteModule,
     ],
     controllers: [],
     providers: [
-        {
-            provide: APP_INTERCEPTOR,
-            useClass: CacheInterceptor,
-        },
-        {
-            provide: APP_GUARD,
-            useClass: RolesGuard,
-          },
+        // {
+        //     provide: APP_INTERCEPTOR,
+        //     useClass: CacheInterceptor,
+        // },
+        // {
+        //     provide: APP_GUARD,
+        //     useClass: RolesGuard,
+        // },
     ],
     exports: [
-      CacheModule.registerAsync({
-        useClass: CacheConfigService
-    }),
-    ]
+        CacheModule.registerAsync({
+            useClass: CacheConfigService,
+        }),
+    ],
 })
-export class AppModule {
-
-
-}
+export class AppModule {}

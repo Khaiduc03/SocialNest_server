@@ -16,7 +16,7 @@ export class LoginUserDto {
     @IsString()
     @Expose()
     @IsNotEmpty()
-    deviceToken: string;
+    device_token: string;
 
-    constructor(deviceToken = '312423432') {}
+  
 }

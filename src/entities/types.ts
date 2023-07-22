@@ -1,6 +1,11 @@
 export type TypeRole = Array<number>;
 
 export enum UserRole {
-    ADMIN = 'admin',
-    USER = 'user',
+    User = 'user',
+    Admin = 'admin',
+}
+
+export enum newsStatus {
+    Public = 'public',
+    Private = 'private',
 }

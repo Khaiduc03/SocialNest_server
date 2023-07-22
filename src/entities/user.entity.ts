@@ -1,8 +1,15 @@
-import { Admin, BeforeInsert, Column, Entity } from 'typeorm';
+import {
+    Admin,
+    BeforeInsert,
+    Column,
+    Entity,
+    JoinColumn,
+    OneToOne,
+} from 'typeorm';
 import { Base } from './base';
 import { Expose, plainToClass } from 'class-transformer';
-import { TypeRole, UserRole } from './types';
-import { hashPassword } from 'src/utils';
+import { UserRole } from './types';
+import { Image } from './image.entity';
 
 @Entity({
     name: 'users',
@@ -23,11 +30,8 @@ export class User extends Base {
     @Column({ type: 'varchar', length: 255, unique: true })
     email: string;
 
-    @Column({
-        type: 'enum',
-        enum: UserRole,
-        default: UserRole.USER,
-    })
+    @Expose()
+    @Column({ type: 'enum', enum: UserRole, default: UserRole.User })
     roles: UserRole;
 
     @Expose()
@@ -50,15 +54,10 @@ export class User extends Base {
     @Column({ type: 'varchar', default: '' })
     device_token: string;
 
-    @BeforeInsert()
-    async hashPassword() {
-        if (this.password) {
-            this.password = await hashPassword(this.password);
-        }
-    }
-
-    
-  
+    @Expose()
+    @OneToOne(() => Image, (image) => image.uuid)
+    @JoinColumn({ name: 'avatar_uuid', referencedColumnName: 'uuid' })
+    avatar: Image;
 
     constructor(user: Partial<User>) {
         super(); // call constructor of BaseEntity

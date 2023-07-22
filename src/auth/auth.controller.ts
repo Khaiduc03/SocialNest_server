@@ -1,7 +1,7 @@
-import { Body, Controller, Get, HttpExceptionBody, HttpExceptionBodyMessage, Post } from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterUserDTO, LoginUserDto } from './dto';
-import { Roles, UserRole } from 'src/core/guards';
+// import { Roles, RolesGuard } from 'src/core/guards';
 
 @Controller('auth')
 export class AuthController {
@@ -19,10 +19,18 @@ export class AuthController {
         return await this.authService.register(registerDTO);
     }
 
-    @Get('test')
-    @Roles(UserRole.ADMIN)
-    async test(): Promise<any> {
-        return 'Thanh cong';
+    @Post('login')
+    async login(@Body() loginDTO: LoginUserDto): Promise<any> {
+        return await this.authService.login(loginDTO);
     }
+
+    // @Get('test')
+    // @UseGuards(RolesGuard)
+    // @SetMetadata('roles', ['USER'])
+    // async test(): Promise<any> {
+    //     return 'Thanh cong';
+    // }
+
+    
 
 }

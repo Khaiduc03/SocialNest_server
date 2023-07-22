@@ -4,16 +4,14 @@ import { AuthController } from './auth.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from 'src/entities';
 import { CacheModule } from '@nestjs/cache-manager';
-import { CacheConfigService } from 'src/configs';
+import { CacheConfigService, JWTService } from 'src/configs';
+import { JwtService } from '@nestjs/jwt';
 
 @Module({
     imports: [
         TypeOrmModule.forFeature([User]),
-        CacheModule.registerAsync({
-            useClass: CacheConfigService,
-        }),
     ],
     controllers: [AuthController],
-    providers: [AuthService],
+    providers: [AuthService,JwtService,JWTService],
 })
 export class AuthModule {}

@@ -28,5 +28,13 @@ services:
             POSTGRES_USER: vip
             POSTGRES_PASSWORD: vip
             POSTGRES_DB: news_api
+    adminer:
+        image: adminer
+        restart: always
+        ports:
+            - 8080:8080
+        depends_on:
+            - postgres
+    
 volumes:
     postgres_data:

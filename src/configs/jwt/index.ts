@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { TypeRole } from 'src/entities/types';
+import { User, UserRole } from 'src/entities';
+
 import {
     ACCESS_TOKEN_EXPIRATION_TIME,
     ACCESS_TOKEN_SECRET,
@@ -11,7 +12,8 @@ import {
 export type JWTPayload = {
     [key: string]: any;
     uuid: string;
-    role: TypeRole;
+    roles: UserRole;
+ 
 };
 
 type Token = 'access' | 'refresh';

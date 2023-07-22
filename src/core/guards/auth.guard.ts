@@ -5,23 +5,25 @@ import {
     UnauthorizedException,
     HttpStatus,
 } from '@nestjs/common';
+import { resolve4 } from 'dns';
 import { Request, Response } from 'express';
 import { Observable } from 'rxjs';
 import { JWTService } from 'src/configs';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-    constructor(private jwtService: JWTService) {}
+    constructor(private readonly jwtService: JWTService) {}
 
     canActivate(
         context: ExecutionContext
     ): boolean | Promise<boolean> | Observable<boolean> {
         const request = context.switchToHttp().getRequest();
         const response = context.switchToHttp().getResponse();
-        return this.validateRequest(request, response);
+        const user = this.validateRequest(request, response);
+        //console.log(request['user']);
+        return user;
     }
 
-    //validate request
     private async validateRequest(
         request: Request,
         response: Response
@@ -31,12 +33,20 @@ export class AuthGuard implements CanActivate {
             if (!token) {
                 throw new UnauthorizedException('Unauthorized');
             }
+
             const user = await this.jwtService.verifyToken(token, 'access');
+
             if (!user) {
                 throw new UnauthorizedException('Unauthorized');
             }
+          
 
             request['user'] = user;
+            //how to user request.user in controller
+
+            //console.log(request['user']);
+
+
             return true;
         } catch (error) {
             response
