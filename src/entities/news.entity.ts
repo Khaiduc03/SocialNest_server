@@ -1,7 +1,7 @@
 import { uuids4 } from 'src/utils';
 import { Base } from './base';
 import { Expose, plainToClass } from 'class-transformer';
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne } from 'typeorm';
 import { newsStatus } from './types';
 import { Image } from './image.entity';
 import { User } from './user.entity';
@@ -33,12 +33,13 @@ export class News extends Base {
 
     @Expose()
     @ManyToOne(() => User, (user) => user.uuid)
+    @JoinColumn({ name: 'user_uuid', referencedColumnName: 'uuid' })
     user_uuid: User;
 
     @Expose()
-    @OneToMany(() => Topic, (topic) => topic.uuid)
-    @JoinColumn()
-    topic: Topic;
+    @ManyToOne(() => Topic, (topic) => topic.uuid)
+    @JoinColumn({ name: 'topic_uuid', referencedColumnName: 'uuid'})
+    topic1: Topic;
 
     constructor(news: Partial<News>) {
         super(); // call constructor of BaseEntity
