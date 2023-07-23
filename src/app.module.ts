@@ -7,6 +7,7 @@ import { CacheInterceptor, CacheModule } from '@nestjs/cache-manager';
 
 import {
     BookmarkModule,
+    CloudModule,
     CommentModule,
     FavoriteModule,
     FollowsModule,
@@ -16,6 +17,7 @@ import {
     TopicModule,
     UserModule,
 } from './modules';
+import { TestModule } from './modules/test/test.module';
 
 @Module({
     imports: [
@@ -46,6 +48,10 @@ import {
         ReCommentModule,
 
         FavoriteModule,
+
+        TestModule,
+
+        CloudModule
     ],
     controllers: [],
     providers: [

@@ -7,3 +7,4 @@ export * from './image';
 export * from './news';
 export * from './re_comment';
 export * from './topic';
+export * from './cloud';

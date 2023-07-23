@@ -41,3 +41,29 @@ export class HttpResponse<T> extends Http {
         this.data = data;
     }
 }
+
+export function createSuccessResponse(
+  data: any,
+  message: string
+): HttpResponse<Http> {
+  return new HttpResponse({
+      code: HttpStatus.OK,
+      message: `${message} successfully!!`,
+      data: data,
+  });
+}
+
+export function createBadRequset(message: string): HttpResponse<Http> {
+  return new HttpError({
+      code: HttpStatus.BAD_REQUEST,
+      message: `${message} failure!!`,
+  });
+}
+export function createNotFound(message: string): HttpResponse<Http> {
+  return new HttpError({
+      code: HttpStatus.NOT_FOUND,
+      message: `${message} not found!!`,
+  });
+}
+
+

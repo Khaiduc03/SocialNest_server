@@ -13,15 +13,15 @@ async function bootstrap() {
         logger: new Logger(),
     });
 
-    app.getHttpAdapter();
+    //app.getHttpAdapter();
 
     // NODE_ENV !== 'testing' && app.use(LoggerMiddleware);
 
-     app.useGlobalInterceptors(new TimeoutInterceptor());
+    // app.useGlobalInterceptors(new TimeoutInterceptor());
 
-    app.useGlobalPipes(new ValidationPipe());
+  //  app.useGlobalPipes(new ValidationPipe());
 
-    app.enableShutdownHooks();
+    //app.enableShutdownHooks();
 
     await app.listen(PORT);
 
