@@ -66,4 +66,11 @@ export function createNotFound(message: string): HttpResponse<Http> {
   });
 }
 
+export function createUnAuthorized(message: string): HttpResponse<Http> {
+    return new HttpError({
+        code: HttpStatus.UNAUTHORIZED,
+        message: `${message} failure!!`,
+    });
+  }
+
 

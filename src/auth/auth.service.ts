@@ -2,11 +2,17 @@ import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User, UserRole } from 'src/entities';
 import { Repository } from 'typeorm';
-import { LoginUserDto, RegisterUserDTO } from './dto';
+import { LoginUserDto, RegisterAdminDTO, RegisterUserDTO } from './dto';
 
 import { comparePassword, hashPassword } from 'src/utils/password';
 
 import { JWTService } from 'src/configs';
+import {
+    Http,
+    createBadRequset,
+    createSuccessResponse,
+    createUnAuthorized,
+} from 'src/common';
 
 @Injectable()
 export class AuthService {
@@ -18,92 +24,124 @@ export class AuthService {
     ) {}
 
     //register
-    async register(registerDTO: RegisterUserDTO): Promise<any> {
-        try {
-            let emailIsExist = await this.userRepository.findOne({
-                where: { email: registerDTO.email },
-            });
-            if (emailIsExist) {
-                return {
-                    message: 'email already exists',
-                    data: null,
-                    status: HttpStatus.BAD_REQUEST,
-                };
-            }
+    async register(registerDTO: RegisterUserDTO): Promise<Http> {
+        let userNameIsExist = await this.userRepository.findOne({
+            where: { username: registerDTO.username },
+        });
+        if (userNameIsExist)
+            return createBadRequset('Username already exists so register');
 
-            let userNameIsExitst = await this.userRepository.findOne({
-                where: { username: registerDTO.username },
-            });
-            if (userNameIsExitst) {
-                return {
-                    message: 'Username already exists',
-                    data: null,
-                    status: HttpStatus.BAD_REQUEST,
-                };
-            }
-            //hash password
+        const password = await hashPassword(registerDTO.password);
 
-            const password = await hashPassword(registerDTO.password);
+        if (!password) return createBadRequset('Password is not hash');
 
-            const newUser = new User({
-                ...registerDTO,
-                password,
-            });
+        const newUser = new User({
+            ...registerDTO,
+            password,
+        });
 
-            const response = await this.userRepository.save(newUser);
+        const response = await this.userRepository.save(newUser);
 
-            return {
-                message: 'email registered successfully',
-                data: response,
-                status: true,
-            };
-        } catch (error) {
-            console.log('register error: ', error);
-        }
+        if (!response) return createBadRequset('Register is');
+
+        return createSuccessResponse(response, 'Register is');
     }
 
-    async login(loginUserDTO: LoginUserDto): Promise<any> {
-
-
-        const user = await this.userRepository.findOne({
-            where: { email: loginUserDTO.email },
-        });
    
-        if (!user) {
-            return {
-                message: 'User not found',
-                data: null,
-                status: HttpStatus.BAD_REQUEST,
-            };
-        }
+
+    async registerAdmin(registerDTO: RegisterAdminDTO): Promise<Http> {
+        let userNameIsExist = await this.userRepository.findOne({
+            where: { username: registerDTO.username },
+        });
+        if (userNameIsExist)
+            return createBadRequset('Username already exists so register');
+
+        const password = await hashPassword(registerDTO.password);
+
+        if (!password) return createBadRequset('Password is not hash');
+
+        const newUser = new User({
+            ...registerDTO,
+            password,
+        });
+
+        const response = await this.userRepository.save(newUser);
+
+        if (!response) return createBadRequset('Register is');
+
+        return createSuccessResponse(response, 'Register is');
+    }
+
+    async login(loginUserDTO: LoginUserDto): Promise<Http> {
+        const userNameIsExist = await this.userRepository.findOne({
+            where: { username: loginUserDTO.username },
+        });
+
+        if (!userNameIsExist) return createBadRequset('Username is not exist');
         const isMatch = await comparePassword(
             loginUserDTO.password,
-            user.password
+            userNameIsExist.password
         );
-        if (!isMatch) {
-            return {
-                message: 'Incorrect password',
-                data: null,
-                status: HttpStatus.BAD_REQUEST,
-            };
-        }
+        if (!isMatch) return createBadRequset('Password is not match');
 
         const device_token = loginUserDTO.device_token;
 
-            await this.userRepository.update(
-            { email: loginUserDTO.email },
+        await this.userRepository.update(
+            { username: loginUserDTO.username },
             { device_token: device_token }
         );
 
-       
+        const access_token = await this.jwtService.signToken(
+            {
+                ...userNameIsExist,
+                device_token: device_token,
+                uuid: userNameIsExist.uuid,
+                roles: userNameIsExist.roles,
+            },
+            'access'
+        );
+
+        const refresh_token = await this.jwtService.signToken(
+            {
+                ...userNameIsExist,
+                device_token: device_token,
+                uuid: userNameIsExist.uuid,
+                roles: userNameIsExist.roles,
+            },
+            'refresh'
+        );
+
+        return createSuccessResponse(
+            {
+                data: {
+                    access_token: access_token,
+                    refresh_token: refresh_token,
+                },
+            },
+            'Login is'
+        );
+    }
+
+    async refreshToken(refreshToken: string): Promise<Http> {
+        const isValid = await this.jwtService.verifyToken(
+            refreshToken,
+            'refresh'
+        );
+
+        if (!isValid) return createUnAuthorized('Refresh token is not valid');
+        const user = await this.userRepository.findOne({
+            where: {
+                uuid: isValid.uuid,
+            },
+        });
+
+        if (!user) return createBadRequset('User is not exist so refresh');
 
         const access_token = await this.jwtService.signToken(
             {
                 ...user,
-                device_token: device_token,
                 uuid: user.uuid,
-                roles: user.roles
-               
+                role: [1],
             },
             'access'
         );
@@ -111,22 +149,26 @@ export class AuthService {
         const refresh_token = await this.jwtService.signToken(
             {
                 ...user,
-                device_token: device_token,
                 uuid: user.uuid,
-                roles: user.roles             
+                role: [1],
             },
             'refresh'
         );
 
-        return {
-            message: 'Login successfully',
-
-            status: HttpStatus.OK,
-            data: {
-                access_token: access_token,
-                refresh_token: refresh_token,
-          
+        return createSuccessResponse(
+            {
+                data: {
+                    access_token: access_token,
+                    refresh_token: refresh_token,
+                },
             },
-        };
+            'Login is'
+        );
     }
+
+
+    
+
+
+
 }

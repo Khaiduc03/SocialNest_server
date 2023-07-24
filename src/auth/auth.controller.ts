@@ -1,6 +1,7 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterUserDTO, LoginUserDto } from './dto';
+import { RegisterAdminDTO } from './dto/RegisterAdmin.dto';
 // import { Roles, RolesGuard } from 'src/core/guards';
 
 @Controller('auth')
@@ -22,6 +23,11 @@ export class AuthController {
     @Post('login')
     async login(@Body() loginDTO: LoginUserDto): Promise<any> {
         return await this.authService.login(loginDTO);
+    }
+
+    @Post('admin')
+    async registerAdmin(@Body() registerDTO:RegisterAdminDTO): Promise<any> {
+        return await this.authService.register(registerDTO);
     }
 
     // @Get('test')

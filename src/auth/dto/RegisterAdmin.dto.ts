@@ -1,9 +1,15 @@
 import { Expose } from 'class-transformer';
 import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
+import { UserRole } from 'src/entities';
 
-export class LoginUserDto {
+export class RegisterAdminDTO {
+    // @IsString()
+    // @IsNotEmpty()
+    // @IsEmail()
+    // @Expose()
+    // email: string;
+
     @IsString()
-    @IsNotEmpty()
     @Expose()
     username: string;
 
@@ -13,9 +19,9 @@ export class LoginUserDto {
     password: string;
 
     @IsString()
-    @Expose()
     @IsNotEmpty()
-    device_token: string;
+    @Expose()
+    roles: UserRole.Admin;
 
-  
+
 }

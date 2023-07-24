@@ -2,11 +2,11 @@ import { Expose } from 'class-transformer';
 import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
 
 export class RegisterUserDTO {
-    @IsString()
-    @IsNotEmpty()
-    @IsEmail()
-    @Expose()
-    email: string;
+    // @IsString()
+    // @IsNotEmpty()
+    // @IsEmail()
+    // @Expose()
+    // email: string;
 
     @IsString()
     @IsNotEmpty()
@@ -14,6 +14,7 @@ export class RegisterUserDTO {
     password: string;
 
     @IsString()
+    @IsNotEmpty()
     @Expose()
     username: string;
 }

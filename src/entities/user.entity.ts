@@ -27,7 +27,7 @@ export class User extends Base {
     password: string;
 
     @Expose()
-    @Column({ type: 'varchar', length: 255, unique: true })
+    @Column({ type: 'varchar', length: 255, unique: true ,default: null})
     email: string;
 
     @Expose()
