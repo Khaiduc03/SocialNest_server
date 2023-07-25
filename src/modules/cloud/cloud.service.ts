@@ -24,7 +24,7 @@ export class CloudService {
     async deleteFileImage(
         publicId: string
     ): Promise<UploadApiResponse | UploadApiErrorResponse> {
-        return await v2.uploader.destroy(publicId);
+        return await v2.api.delete_resources([publicId]);
     }
 
     async uploadMultipleImages(

@@ -4,6 +4,6 @@ import { CloudService } from './cloud.service';
 
 @Module({
     exports: [CloudProvider, CloudService],
-    providers: [CloudProvider, CloudService],
+   providers: [CloudProvider, CloudService],
 })
 export class CloudModule {}

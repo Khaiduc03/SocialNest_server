@@ -5,7 +5,7 @@ import { User } from './user.entity';
 import { uuids4 } from 'src/utils';
 
 @Entity({
-    name: 'topic',
+    name: Topic.name.toLowerCase(),
     orderBy: {
         uuid: 'ASC',
     },

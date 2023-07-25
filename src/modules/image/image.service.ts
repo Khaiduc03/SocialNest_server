@@ -6,7 +6,6 @@ import { Image } from 'src/entities/image.entity';
 import { Repository } from 'typeorm';
 import { CloudService } from '../cloud';
 import { Http, createBadRequset, createSuccessResponse } from 'src/common';
-import { createImage } from './dto';
 @Injectable()
 export class ImageService {
     constructor(
@@ -20,6 +19,21 @@ export class ImageService {
         folder: string
     ): Promise<UploadApiResponse | UploadApiErrorResponse> {
         const response = await this.cloud.uploadFileImage(file, folder);
+        return response;
+    }
+
+    async uploadMutipleImageToCloud(
+        file: Express.Multer.File[],
+        folder: string
+    ): Promise<any> {
+        const response = await this.cloud.uploadMultipleImages(file, folder);
+        return response;
+    }
+
+    async deleteImageFromCloud(
+        publicId: string
+    ): Promise<UploadApiResponse | UploadApiErrorResponse> {
+        const response = await this.cloud.deleteFileImage(publicId);
         return response;
     }
 
@@ -44,9 +58,12 @@ export class ImageService {
         folder: string
     ): Promise<Image[]> {
         const uploadedImages: Image[] = [];
-    
+
+        //How to get leght of array in for loop
+
+        const uploaded = await this.uploadMutipleImageToCloud(files, folder);
+
         for (const file of files) {
-            const uploaded = await this.uploadImageToCloud(file, folder);
             if (uploaded) {
                 const image = new Image({
                     public_id: uploaded.public_id,
@@ -56,8 +73,8 @@ export class ImageService {
                 uploadedImages.push(image);
             }
         }
-    
-        const response = await this.imageRepository.save(uploadedImages);
+
+        const response = await this.imageRepository.save(uploaded);
         return response;
     }
 
@@ -100,24 +117,50 @@ export class ImageService {
         return createSuccessResponse(image, 'Get images');
     }
 
+    //delete image
     async deleteImage(uuid: string): Promise<Http> {
-        try {
-            if (!uuid) return createBadRequset('delete image');
+        if (!uuid) return createBadRequset('delete image');
+        // console.log(uuid);
+        const image = await this.imageRepository
 
-            const image = await this.imageRepository
-                .findOneByOrFail({
-                    uuid: uuid,
-                })
-                .catch();
-            if (!image) return createBadRequset('delete image');
+            .createQueryBuilder('image')
+            .where('image.uuid = :uuid', { uuid })
+            .getOne();
 
-            const reponse = await this.imageRepository.remove(image);
-            return createSuccessResponse(
-                `image delete at time: ${reponse.deletedAt}`,
-                'Delete image'
-            );
-        } catch (error) {
-            throw createBadRequset(`${error}`);
-        }
+           
+
+        if (!image.public_id) return createBadRequset('delete image');
+
+        const deleteImage = await this.deleteImageFromCloud(image.public_id);
+      console.log(deleteImage);
+         await this.imageRepository.softRemove(image);
+        // console.log(reponse);
+        
     }
+
+    // async deleteImage(uuid: string): Promise<Http> {
+    //     try {
+    //         if (!uuid) return createBadRequset('delete image');
+
+    //         const image = await this.imageRepository
+    //             .createQueryBuilder('image')
+    //             .where('image.uuid = :uuid', { uuid })
+    //             .getOne();
+
+    //             console.log(image);
+
+    //         //if (!image) return createBadRequset('delete image');
+    //        //const deleteImage = await this.deleteImageFromCloud(image.public_id);
+    //        // console.log( "=>>>>>>>>>>>",deleteImage );
+    //        //how to set image to null
+
+    //         const reponse = await this.imageRepository.remove(image);
+    //         return createSuccessResponse(
+    //             `image delete at time: ${reponse.deletedAt}`,
+    //             'Delete image'
+    //         );
+    //     } catch (error) {
+    //         throw createBadRequset(`${error}`);
+    //     }
+    // }
 }

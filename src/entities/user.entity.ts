@@ -12,7 +12,7 @@ import { UserRole } from './types';
 import { Image } from './image.entity';
 
 @Entity({
-    name: 'users',
+    name: User.name.toLowerCase(),
     orderBy: {
         uuid: 'ASC',
     },
@@ -33,6 +33,10 @@ export class User extends Base {
     @Expose()
     @Column({ type: 'enum', enum: UserRole, default: UserRole.User })
     roles: UserRole;
+
+    @Expose()
+    @Column({ type: 'varchar', length: 255, default: '' })
+    fullname: string;
 
     @Expose()
     @Column({ type: 'varchar', length: 255, nullable: true })

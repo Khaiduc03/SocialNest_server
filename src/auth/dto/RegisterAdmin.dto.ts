@@ -17,11 +17,4 @@ export class RegisterAdminDTO {
     @IsNotEmpty()
     @Expose()
     password: string;
-
-    @IsString()
-    @IsNotEmpty()
-    @Expose()
-    roles: UserRole.Admin;
-
-
 }

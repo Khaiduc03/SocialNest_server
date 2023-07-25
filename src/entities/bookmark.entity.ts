@@ -7,7 +7,7 @@ import { News } from './news.entity';
 
 
 @Entity({
-    name: 'bookmark',
+    name: Bookmark.name.toLowerCase(),
     orderBy: {
         uuid: 'ASC',
     },

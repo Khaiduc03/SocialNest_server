@@ -6,7 +6,7 @@ import { User } from './user.entity';
 
 
 @Entity({
-    name: 'follows',
+    name: Follows.name.toLowerCase(),
     orderBy: {
         uuid: 'ASC',
     },

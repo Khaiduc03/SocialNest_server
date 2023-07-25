@@ -4,22 +4,22 @@ import { Expose, plainToClass } from 'class-transformer';
 import { uuids4 } from 'src/utils';
 
 @Entity({
-    name: 'image',
+    name: Image.name.toLowerCase(),
     orderBy: {
         createdAt: 'ASC',
     },
 })
 export class Image extends Base {
     @Expose()
-    @Column({ type: 'varchar', length: 300, nullable: false })
+    @Column({ type: 'varchar', length: 300, nullable: true })
     public_id: string;
 
     @Expose()
-    @Column({ type: 'varchar',length:300, nullable: false })
+    @Column({ type: 'varchar',length:300, nullable: true })
     url: string;
 
     @Expose()
-    @Column({ type: 'varchar', length:300,nullable: false })
+    @Column({ type: 'varchar', length:300,nullable: true })
     secure_url: string;
 
     constructor(image: Partial<Image>) {

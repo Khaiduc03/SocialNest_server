@@ -8,7 +8,7 @@ import { User } from './user.entity';
 import { Topic } from './topic.entity';
 
 @Entity({
-    name: 'news',
+    name: News.name.toLowerCase(),
     orderBy: {
         uuid: 'ASC',
     },

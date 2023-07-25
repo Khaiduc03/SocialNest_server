@@ -13,7 +13,7 @@ export class TypeOrmService implements TypeOrmOptionsFactory {
     async createTypeOrmOptions(): Promise<TypeOrmModuleOptions> {
        // console.log(POSTGRES_DB);
         //how to log url
-        console.log(`postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}`);
+        //console.log(`postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}`);
        
         return {
             type: 'postgres',

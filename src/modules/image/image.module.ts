@@ -8,12 +8,8 @@ import { JWTService } from 'src/configs';
 import { JwtService } from '@nestjs/jwt';
 
 @Module({
-  imports:[
-    TypeOrmModule.forFeature([Image])
-  ],
-  controllers: [ImageController],
-  providers: [ImageService,CloudService, JWTService,JwtService]
-
-
+    imports: [TypeOrmModule.forFeature([Image])],
+    controllers: [ImageController],
+    providers: [ImageService, CloudService, JWTService, JwtService],
 })
 export class ImageModule {}

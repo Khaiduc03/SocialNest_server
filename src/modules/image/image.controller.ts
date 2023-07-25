@@ -11,15 +11,18 @@ import {
     UseInterceptors,
 } from '@nestjs/common';
 import { ImageService } from './image.service';
-import { FileFieldsInterceptor, FileInterceptor } from '@nestjs/platform-express';
+import {
+    FileFieldsInterceptor,
+    FileInterceptor,
+} from '@nestjs/platform-express';
 
 import { AuthGuard } from 'src/core';
 import { Http, createSuccessResponse } from 'src/common';
-import { createImage, uuidImage } from './dto';
+import { uuidImage } from './dto';
 import { Image } from 'src/entities';
 
 @Controller('image')
-// @UseGuards(AuthGuard)
+@UseGuards(AuthGuard)
 export class ImageController {
     constructor(private readonly imageService: ImageService) {}
 
@@ -49,12 +52,13 @@ export class ImageController {
             { name: 'image2', maxCount: 1 },
         ])
     )
-    async uploadMultipleImages(
-        @UploadedFiles() files
-    ): Promise<any> {
-        console.log(files);
-        // const response = await this.imageService.uploadMultipleImages(images, 'test');
-        //return createSuccessResponse(response, 'Create image');
+    async uploadMultipleImages(@UploadedFiles() files): Promise<any> {
+        //console.log(files);
+        const response = await this.imageService.uploadMultipleImages(
+            files,
+            'test'
+        );
+        return createSuccessResponse(response, 'Create image');
     }
 
     @Delete()

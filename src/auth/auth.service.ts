@@ -63,6 +63,7 @@ export class AuthService {
         const newUser = new User({
             ...registerDTO,
             password,
+            roles: UserRole.Admin,
         });
 
         const response = await this.userRepository.save(newUser);
@@ -72,7 +73,7 @@ export class AuthService {
         return createSuccessResponse(response, 'Register is');
     }
 
-    async login(loginUserDTO: LoginUserDto): Promise<Http> {
+    async login(loginUserDTO: LoginUserDto): Promise<Object> {
         const userNameIsExist = await this.userRepository.findOne({
             where: { username: loginUserDTO.username },
         });
@@ -111,15 +112,7 @@ export class AuthService {
             'refresh'
         );
 
-        return createSuccessResponse(
-            {
-                data: {
-                    access_token: access_token,
-                    refresh_token: refresh_token,
-                },
-            },
-            'Login is'
-        );
+        return {access_token,refresh_token }
     }
 
     async refreshToken(refreshToken: string): Promise<Http> {

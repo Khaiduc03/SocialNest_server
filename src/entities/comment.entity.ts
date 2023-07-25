@@ -13,7 +13,7 @@ import { User } from './user.entity';
 import { News } from './news.entity';
 
 @Entity({
-    name: 'comment',
+    name: Comment.name.toLowerCase(),
     orderBy: {
         uuid: 'ASC',
     },
