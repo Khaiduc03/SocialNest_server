@@ -37,9 +37,11 @@ export class News extends Base {
     user_uuid: User;
 
     @Expose()
-    @ManyToOne(() => Topic, (topic) => topic.uuid)
+    @OneToMany(() => Topic, (topic) => topic.news)
     @JoinColumn({ name: 'topic_uuid', referencedColumnName: 'uuid'})
-    topic1: Topic;
+    topic: Topic[];
+
+   
 
     constructor(news: Partial<News>) {
         super(); // call constructor of BaseEntity

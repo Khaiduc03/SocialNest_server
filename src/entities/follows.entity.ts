@@ -27,7 +27,7 @@ export class Follows extends Base {
     @Column({ type: 'varchar', length: 300, nullable: false })
     test : string;
 
-    constructor(follows: Partial<User>) {
+    constructor(follows: Partial<Follows>) {
         super();
         if (follows) {
             Object.assign(

@@ -61,8 +61,8 @@ export class ImageController {
         return createSuccessResponse(response, 'Create image');
     }
 
-    @Delete()
-    async deleteImage(@Body() uuid: uuidImage): Promise<Http> {
-        return await this.imageService.deleteImage(uuid.uuid);
-    }
+    // @Delete()
+    // async deleteImage(@Body() uuid: uuidImage): Promise<Http> {
+    //     return await this.imageService.deleteImage(uuid.uuid);
+    // }
 }

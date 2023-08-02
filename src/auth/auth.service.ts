@@ -1,3 +1,4 @@
+import { ImageService } from './../modules/image/image.service';
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User, UserRole } from 'src/entities';
@@ -19,7 +20,7 @@ export class AuthService {
     constructor(
         @InjectRepository(User)
         private readonly userRepository: Repository<User>,
-
+        private readonly imageService: ImageService,
         private readonly jwtService: JWTService
     ) {}
 
@@ -34,10 +35,12 @@ export class AuthService {
         const password = await hashPassword(registerDTO.password);
 
         if (!password) return createBadRequset('Password is not hash');
+        //const avatar = await this.imageService.createImage();
 
         const newUser = new User({
             ...registerDTO,
             password,
+            avatar: await this.imageService.createImage(),
         });
 
         const response = await this.userRepository.save(newUser);
@@ -46,8 +49,6 @@ export class AuthService {
 
         return createSuccessResponse(response, 'Register is');
     }
-
-   
 
     async registerAdmin(registerDTO: RegisterAdminDTO): Promise<Http> {
         let userNameIsExist = await this.userRepository.findOne({
@@ -112,7 +113,7 @@ export class AuthService {
             'refresh'
         );
 
-        return {access_token,refresh_token }
+        return { access_token, refresh_token };
     }
 
     async refreshToken(refreshToken: string): Promise<Http> {
@@ -158,10 +159,4 @@ export class AuthService {
             'Login is'
         );
     }
-
-
-    
-
-
-
 }

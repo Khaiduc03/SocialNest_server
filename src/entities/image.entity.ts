@@ -1,4 +1,4 @@
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { Base } from './base';
 import { Expose, plainToClass } from 'class-transformer';
 import { uuids4 } from 'src/utils';
@@ -11,16 +11,20 @@ import { uuids4 } from 'src/utils';
 })
 export class Image extends Base {
     @Expose()
-    @Column({ type: 'varchar', length: 300, nullable: true })
+    @Column({ type: 'varchar', length: 300, nullable: true, default: null })
     public_id: string;
 
     @Expose()
-    @Column({ type: 'varchar',length:300, nullable: true })
+    @Column({ type: 'varchar',length:300, nullable: true , default: null})
     url: string;
 
     @Expose()
-    @Column({ type: 'varchar', length:300,nullable: true })
+    @Column({ type: 'varchar', length:300,nullable: true , default: null})
     secure_url: string;
+    
+    @Expose()
+    @PrimaryGeneratedColumn('uuid')
+    uuid: string;
 
     constructor(image: Partial<Image>) {
         super();

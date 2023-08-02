@@ -12,7 +12,7 @@ services:
             POSTGRES_PASSWORD: vip
             POSTGRES_DB: news_api
         volumes:
-           - postgres_data:/var/lib/postgresql/data
+           - postgres_data1:/var/lib/postgresql/data
 
     nestjs:
         build: .
@@ -37,4 +37,4 @@ services:
             - postgres
     
 volumes:
-    postgres_data:
+    postgres_data1:

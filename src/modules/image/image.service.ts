@@ -1,3 +1,4 @@
+import { createImage } from './dto/index';
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UploadApiErrorResponse, UploadApiResponse } from 'cloudinary';
@@ -5,7 +6,12 @@ import { UploadApiErrorResponse, UploadApiResponse } from 'cloudinary';
 import { Image } from 'src/entities/image.entity';
 import { Repository } from 'typeorm';
 import { CloudService } from '../cloud';
-import { Http, createBadRequset, createSuccessResponse } from 'src/common';
+import {
+    Http,
+    createBadRequset,
+    createBadRequsetNoMess,
+    createSuccessResponse,
+} from 'src/common';
 @Injectable()
 export class ImageService {
     constructor(
@@ -13,7 +19,7 @@ export class ImageService {
         private readonly imageRepository: Repository<Image>,
         private readonly cloud: CloudService
     ) {}
-
+    /////////////////////////////// cloudinary ///////////////////////////////
     async uploadImageToCloud(
         file: Express.Multer.File,
         folder: string
@@ -37,6 +43,15 @@ export class ImageService {
         return response;
     }
 
+    async uploadAvatarToCloud(
+        file: Express.Multer.File,
+        folder: string
+    ): Promise<UploadApiResponse | UploadApiErrorResponse> {
+        const response = await this.cloud.uploadFileAvatar(file, folder);
+        return response;
+    }
+
+    //////////////////////////// image ////////////////////////////
     async uploadImage(
         file: Express.Multer.File,
         folder: string
@@ -78,31 +93,6 @@ export class ImageService {
         return response;
     }
 
-    async createImage(
-        file: Express.Multer.File,
-        folder: string
-    ): Promise<Http> {
-        const uploaded = await this.uploadImageToCloud(file, folder);
-        if (!uploaded) return createBadRequset('Create image');
-
-        const { url, public_id, secure_url } = uploaded;
-
-        const imageEntity = new Image({
-            url,
-            public_id,
-            secure_url,
-        });
-
-        imageEntity.url = url;
-        imageEntity.public_id = public_id;
-        imageEntity.secure_url = secure_url;
-
-        const response = await this.imageRepository.save(imageEntity);
-        if (!response) return createBadRequset('Create image');
-
-        return createSuccessResponse(response, 'Create image');
-    }
-
     async getImages(): Promise<Http> {
         const response = await this.imageRepository.find();
         return createSuccessResponse(response, 'Get images');
@@ -117,50 +107,68 @@ export class ImageService {
         return createSuccessResponse(image, 'Get images');
     }
 
-    //delete image
-    async deleteImage(uuid: string): Promise<Http> {
-        if (!uuid) return createBadRequset('delete image');
-        // console.log(uuid);
-        const image = await this.imageRepository
+    /*
+     * 1. get image from database
+    *  2. delete image from cloud
+    * 3. set image to null
+    * 4. create new image
+    * 5. save image to database
+    * 6. return image
 
-            .createQueryBuilder('image')
-            .where('image.uuid = :uuid', { uuid })
-            .getOne();
+    */
 
-           
-
-        if (!image.public_id) return createBadRequset('delete image');
-
-        const deleteImage = await this.deleteImageFromCloud(image.public_id);
-      console.log(deleteImage);
-         await this.imageRepository.softRemove(image);
-        // console.log(reponse);
-        
+    async createImage(): Promise<Image> {
+        const image = new Image({});
+        const response = await this.imageRepository.save(image);
+        //console.log(response)
+        return response;
     }
 
-    // async deleteImage(uuid: string): Promise<Http> {
-    //     try {
-    //         if (!uuid) return createBadRequset('delete image');
+    async updateAvatar(
+        avatar: Image,
+        file: Express.Multer.File,
+        folder: string
+    ): Promise<any> {
+        if (avatar !== null) {
+            await this.deleteImageFromCloud(avatar.public_id);
+        }
 
-    //         const image = await this.imageRepository
-    //             .createQueryBuilder('image')
-    //             .where('image.uuid = :uuid', { uuid })
-    //             .getOne();
+        const uploaded = await this.uploadAvatarToCloud(file, folder);
+        if (!uploaded) return null;
+        const response = await this.imageRepository.update(avatar.uuid, {
+            public_id: uploaded.public_id,
+            url: uploaded.url,
+            secure_url: uploaded.secure_url,
+        });
+        return response;
+        //const uploaded = await this.uploadAvatarToCloud(file, folder);
 
-    //             console.log(image);
+        // await this.deleteImageFromCloud(avatar.public_id);
+        // const uploaded = await this.uploadAvatarToCloud(file, folder);
+        // const response = await this.imageRepository.save({
+        //     public_id: uploaded.public_id,
+        //     url: uploaded.url,
+        //     secure_url: uploaded.secure_url,
+        //     uuid: avatar.uuid,
+        // });
+        // console.log(response);
+        // return response;
+    }
 
-    //         //if (!image) return createBadRequset('delete image');
-    //        //const deleteImage = await this.deleteImageFromCloud(image.public_id);
-    //        // console.log( "=>>>>>>>>>>>",deleteImage );
-    //        //how to set image to null
-
-    //         const reponse = await this.imageRepository.remove(image);
-    //         return createSuccessResponse(
-    //             `image delete at time: ${reponse.deletedAt}`,
-    //             'Delete image'
-    //         );
-    //     } catch (error) {
-    //         throw createBadRequset(`${error}`);
-    //     }
-    // }
+    // delete image
+    async deleteAvatar(avatar: Image): Promise<Http> {
+        const image = await this.imageRepository.findOne({
+            where: { uuid: avatar.uuid },
+        });
+        if (!image) return createBadRequsetNoMess('Image not found');
+        await this.deleteImageFromCloud(image.public_id).catch((error) => {
+            return createBadRequsetNoMess(error);
+        });
+        await this.imageRepository.update(image.uuid, {
+            public_id: null,
+            url: null,
+            secure_url: null,
+        });
+        return createSuccessResponse(image, 'Delete image');
+    }
 }

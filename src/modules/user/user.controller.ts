@@ -1,8 +1,10 @@
 import {
+    Body,
     Controller,
     Delete,
     Get,
     Post,
+    Put,
     Query,
     Req,
     UploadedFile,
@@ -14,6 +16,7 @@ import { Http } from 'src/common';
 import { AuthGuard } from 'src/core';
 import { Request } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { GetUserDTO, UpdateProfileDTO } from './dto';
 
 @Controller('user')
 @UseGuards(AuthGuard)
@@ -21,7 +24,12 @@ export class UserController {
     constructor(private userService: UserService) {}
 
     @Get()
-    async getUserBy(@Query('uuid') uuid: string): Promise<Http> {
+    async getAllUsers(): Promise<Http> {
+        return await this.userService.getAllUsers();
+    }
+
+    @Get()
+    async getUserById(@Query('uuid') uuid: string): Promise<Http> {
         return await this.userService.getUserById(uuid);
     }
 
@@ -32,20 +40,35 @@ export class UserController {
         return await this.userService.getProfileUser(uuid);
     }
 
-    @Post('avatar')
-    @UseInterceptors(FileInterceptor('avatar'))
-    async getAvatar(
+    //update profile
+    @Post('profile')
+    async updateProfile(
         @Req() req: Request,
-        @UploadedFile() avatar: Express.Multer.File
-    ): Promise<Http> {
+        @Body() updateProfile:UpdateProfileDTO):Promise<Http>{
         const { uuid } = req['user'];
-        return await this.userService.updateAvatar(uuid, avatar);
-    }
+        return await this.userService.updateProfile(updateProfile,uuid);
+        }
 
-    @Delete('avatar')
-    async deleteAvatar(@Req() body: Request): Promise<Http> {
-        const { uuid } = body['user'];
+    // @Put('avatar')
+    // @UseInterceptors(FileInterceptor('avatar'))
+    // async getAvatar(
+    //     @Req() req: Request,
+    //     @UploadedFile() avatar: Express.Multer.File
+    // ): Promise<Http> {
+    //     const { uuid } = req['user'];
+    //     return await this.userService.updateAvatar(uuid, avatar);
+    // }
 
-        return await this.userService.deleteAvatar(uuid);
+    // @Delete('avatar')
+    // async deleteAvatar(@Req() body: Request): Promise<Http> {
+    //     const { uuid } = body['user'];
+
+    //     return await this.userService.deleteAvatar(uuid);
+    // }
+
+    @Delete()
+    async deleteUser(@Body() user: GetUserDTO): Promise<Http> {
+        
+        return await this.userService.deleteUser(user);
     }
 }

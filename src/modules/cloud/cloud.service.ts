@@ -31,9 +31,33 @@ export class CloudService {
         files: Express.Multer.File[],
         folder: string
     ): Promise<(UploadApiResponse | UploadApiErrorResponse)[]> {
-        const uploadPromises = files.map((file) => this.uploadFileImage(file, folder));
+        const uploadPromises = files.map((file) =>
+            this.uploadFileImage(file, folder)
+        );
         return Promise.all(uploadPromises);
     }
 
-    
+    async uploadFileAvatar(
+        file: Express.Multer.File,
+        folder: string
+    ): Promise<UploadApiResponse | UploadApiErrorResponse> {
+        return new Promise((resolve, reject) => {
+            const upload = v2.uploader.upload_stream(
+                {
+                    folder,
+                    use_filename: true,
+                    exif: true,
+                    invalidate: true,
+                    unique_filename: true,
+                    overwrite: true,
+                    resource_type: 'image',
+                },
+                (error, result) => {
+                    if (error) return reject(error);
+                    resolve(result);
+                }
+            );
+            toStream(file.buffer).pipe(upload);
+        });
+    }
 }

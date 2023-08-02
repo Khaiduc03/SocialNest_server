@@ -1,9 +1,13 @@
 import {
     Admin,
+    AfterInsert,
     BeforeInsert,
     Column,
     Entity,
     JoinColumn,
+    ManyToMany,
+    ManyToOne,
+    OneToMany,
     OneToOne,
 } from 'typeorm';
 import { Base } from './base';
@@ -27,7 +31,7 @@ export class User extends Base {
     password: string;
 
     @Expose()
-    @Column({ type: 'varchar', length: 255, unique: true ,default: null})
+    @Column({ type: 'varchar', length: 255, unique: true, default: null })
     email: string;
 
     @Expose()
@@ -51,7 +55,7 @@ export class User extends Base {
     gender: boolean;
 
     @Expose()
-    @Column({ type: 'bool', default: false })
+    @Column({ type: 'boolean', default: false })
     status: boolean;
 
     @Expose()

@@ -8,6 +8,7 @@ import { CacheInterceptor, CacheModule } from '@nestjs/cache-manager';
 import {
     BookmarkModule,
     CloudModule,
+    CloudService,
     CommentModule,
     FavoriteModule,
     FollowsModule,
@@ -51,7 +52,7 @@ import { TestModule } from './modules/test/test.module';
 
         TestModule,
 
-        CloudModule
+        CloudModule,
     ],
     controllers: [],
     providers: [

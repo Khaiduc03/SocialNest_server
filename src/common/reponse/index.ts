@@ -59,6 +59,13 @@ export function createBadRequset(message: string): HttpResponse<Http> {
       message: `${message} failure!!`,
   });
 }
+
+export function createBadRequsetNoMess(message: string): HttpResponse<Http> {
+    return new HttpError({
+        code: HttpStatus.BAD_REQUEST,
+        message: `${message}`,
+    });
+  }
 export function createNotFound(message: string): HttpResponse<Http> {
   return new HttpError({
       code: HttpStatus.NOT_FOUND,
