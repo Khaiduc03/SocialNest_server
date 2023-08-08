@@ -74,45 +74,45 @@ export class UserService {
         return createSuccessResponse(response, 'Update profile');
     }
 
-    // update avatar
-    // async updateAvatar(
-    //     uuid: string,
-    //     avatar: Express.Multer.File
-    // ): Promise<Http> {
-    //     const isExist = await this.userRepository
-    //         .createQueryBuilder('user')
-    //         .where('user.uuid = :uuid', { uuid })
-    //         .leftJoinAndSelect('user.avatar', 'avatar')
-    //         .getOne();
-    //     if (!isExist) return createBadRequsetNoMess('Update avatar not found');
+    //update avatar
+    async updateAvatar(
+        uuid: string,
+        avatar: Express.Multer.File
+    ): Promise<Http> {
+        const isExist = await this.userRepository
+            .createQueryBuilder('user')
+            .where('user.uuid = :uuid', { uuid })
+            .leftJoinAndSelect('user.avatar', 'avatar')
+            .getOne();
+        if (!isExist) return createBadRequsetNoMess('Update avatar not found');
 
-    //     const uploaded = await this.imageService.updateAvatar(
-    //         isExist.avatar,
-    //         avatar,
-    //         isExist.username
-    //     );
+        const uploaded = await this.imageService.updateAvatar(
+            isExist.avatar,
+            avatar,
+            isExist.username
+        );
 
-    //     // if (!uploaded) return createBadRequsetNoMess('here');
-    //     // const response = await this.userRepository.save(isExist);
-    //     // if (!response) return createBadRequset('Update avatar');
-    //     return createSuccessResponse(uploaded, 'Update avatar');
-    // }
+        // if (!uploaded) return createBadRequsetNoMess('here');
+        // const response = await this.userRepository.save(isExist);
+        // if (!response) return createBadRequset('Update avatar');
+        return createSuccessResponse(uploaded, 'Update avatar');
+    }
 
-    // // delete avatar
-    // async deleteAvatar(uuid: string): Promise<Http> {
-    //     const isExist = await this.userRepository
-    //         .createQueryBuilder('user')
-    //         .where('user.uuid = :uuid', { uuid })
-    //         .leftJoinAndSelect('user.avatar', 'avatar')
-    //         .getOne();
-    //     if (!isExist.avatar) return createBadRequset('Delete avatar');
+    // delete avatar
+    async deleteAvatar(uuid: string): Promise<Http> {
+        const isExist = await this.userRepository
+            .createQueryBuilder('user')
+            .where('user.uuid = :uuid', { uuid })
+            .leftJoinAndSelect('user.avatar', 'avatar')
+            .getOne();
+        if (!isExist.avatar) return createBadRequset('Delete avatar');
 
-    //     const deleted = await this.imageService.deleteAvatar(isExist.avatar);
+        const deleted = await this.imageService.deleteAvatar(isExist.avatar);
 
-    //     if (!deleted) return createBadRequset('Delete avatar');
-    //     console.log(deleted);
-    //     return deleted;
-    // }
+        if (!deleted) return createBadRequset('Delete avatar');
+        console.log(deleted);
+        return deleted;
+    }
 
     // delete user by id
     async deleteUser(user: GetUserDTO): Promise<Http> {

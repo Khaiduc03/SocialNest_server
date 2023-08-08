@@ -1,14 +1,13 @@
 import { Module } from '@nestjs/common';
 
-import { AuthModule } from './auth/auth.module';
+import { CacheModule } from '@nestjs/cache-manager';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AuthModule } from './auth/auth.module';
 import { CacheConfigService, TypeOrmService } from './configs';
-import { CacheInterceptor, CacheModule } from '@nestjs/cache-manager';
 
 import {
     BookmarkModule,
     CloudModule,
-    CloudService,
     CommentModule,
     FavoriteModule,
     FollowsModule,
@@ -16,7 +15,7 @@ import {
     NewsModule,
     ReCommentModule,
     TopicModule,
-    UserModule,
+    UserModule
 } from './modules';
 import { TestModule } from './modules/test/test.module';
 
@@ -55,16 +54,7 @@ import { TestModule } from './modules/test/test.module';
         CloudModule,
     ],
     controllers: [],
-    providers: [
-        // {
-        //     provide: APP_INTERCEPTOR,
-        //     useClass: CacheInterceptor,
-        // },
-        // {
-        //     provide: APP_GUARD,
-        //     useClass: RolesGuard,
-        // },
-    ],
+    providers: [],
     exports: [
         CacheModule.registerAsync({
             useClass: CacheConfigService,

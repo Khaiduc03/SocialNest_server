@@ -141,18 +141,6 @@ export class ImageService {
             secure_url: uploaded.secure_url,
         });
         return response;
-        //const uploaded = await this.uploadAvatarToCloud(file, folder);
-
-        // await this.deleteImageFromCloud(avatar.public_id);
-        // const uploaded = await this.uploadAvatarToCloud(file, folder);
-        // const response = await this.imageRepository.save({
-        //     public_id: uploaded.public_id,
-        //     url: uploaded.url,
-        //     secure_url: uploaded.secure_url,
-        //     uuid: avatar.uuid,
-        // });
-        // console.log(response);
-        // return response;
     }
 
     // delete image

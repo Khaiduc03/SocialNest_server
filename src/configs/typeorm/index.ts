@@ -11,13 +11,10 @@ import {
 @Injectable()
 export class TypeOrmService implements TypeOrmOptionsFactory {
     async createTypeOrmOptions(): Promise<TypeOrmModuleOptions> {
-       // console.log(POSTGRES_DB);
-        //how to log url
-        //console.log(`postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}`);
-       
+      
         return {
             type: 'postgres',
-            url: `postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}`,
+            //url: `postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}`,
             host: POSTGRES_HOST,
             port: POSTGRES_PORT,
             username: POSTGRES_USER,

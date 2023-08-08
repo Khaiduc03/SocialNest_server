@@ -44,31 +44,31 @@ export class UserController {
     @Post('profile')
     async updateProfile(
         @Req() req: Request,
-        @Body() updateProfile:UpdateProfileDTO):Promise<Http>{
+        @Body() updateProfile: UpdateProfileDTO
+    ): Promise<Http> {
         const { uuid } = req['user'];
-        return await this.userService.updateProfile(updateProfile,uuid);
-        }
+        return await this.userService.updateProfile(updateProfile, uuid);
+    }
 
-    // @Put('avatar')
-    // @UseInterceptors(FileInterceptor('avatar'))
-    // async getAvatar(
-    //     @Req() req: Request,
-    //     @UploadedFile() avatar: Express.Multer.File
-    // ): Promise<Http> {
-    //     const { uuid } = req['user'];
-    //     return await this.userService.updateAvatar(uuid, avatar);
-    // }
+    @Put('avatar')
+    @UseInterceptors(FileInterceptor('avatar'))
+    async getAvatar(
+        @Req() req: Request,
+        @UploadedFile() avatar: Express.Multer.File
+    ): Promise<Http> {
+        const { uuid } = req['user'];
+        return await this.userService.updateAvatar(uuid, avatar);
+    }
 
-    // @Delete('avatar')
-    // async deleteAvatar(@Req() body: Request): Promise<Http> {
-    //     const { uuid } = body['user'];
+    @Delete('avatar')
+    async deleteAvatar(@Req() body: Request): Promise<Http> {
+        const { uuid } = body['user'];
 
-    //     return await this.userService.deleteAvatar(uuid);
-    // }
+        return await this.userService.deleteAvatar(uuid);
+    }
 
     @Delete()
     async deleteUser(@Body() user: GetUserDTO): Promise<Http> {
-        
         return await this.userService.deleteUser(user);
     }
 }

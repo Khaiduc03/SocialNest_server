@@ -3,7 +3,12 @@ import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User, UserRole } from 'src/entities';
 import { Repository } from 'typeorm';
-import { LoginUserDto, RegisterAdminDTO, RegisterUserDTO } from './dto';
+import {
+    LoginUserDto,
+    RefreshTokenDto,
+    RegisterAdminDTO,
+    RegisterUserDTO,
+} from './dto';
 
 import { comparePassword, hashPassword } from 'src/utils/password';
 
@@ -113,50 +118,64 @@ export class AuthService {
             'refresh'
         );
 
-        return { access_token, refresh_token };
+        return createSuccessResponse(
+            { access_token, refresh_token },
+            'Login is'
+        );
     }
 
-    async refreshToken(refreshToken: string): Promise<Http> {
-        const isValid = await this.jwtService.verifyToken(
-            refreshToken,
-            'refresh'
-        );
+    async refreshToken(refreshTokenDto: RefreshTokenDto): Promise<Http> {
+        try {
+            const isValid = await this.jwtService.verifyToken(
+                refreshTokenDto.refreshToken,
+                'refresh'
+            );
 
-        if (!isValid) return createUnAuthorized('Refresh token is not valid');
-        const user = await this.userRepository.findOne({
-            where: {
-                uuid: isValid.uuid,
-            },
-        });
+            if (!isValid) {
+                return createUnAuthorized('Refresh token is not valid');
+            }
 
-        if (!user) return createBadRequset('User is not exist so refresh');
+            const user = await this.userRepository.findOne({
+                where: {
+                    uuid: isValid.uuid,
+                },
+            });
 
-        const access_token = await this.jwtService.signToken(
-            {
-                ...user,
-                uuid: user.uuid,
-                role: [1],
-            },
-            'access'
-        );
+            if (!user) {
+                return createBadRequset(
+                    'User does not exist, so cannot refresh'
+                );
+            }
 
-        const refresh_token = await this.jwtService.signToken(
-            {
-                ...user,
-                uuid: user.uuid,
-                role: [1],
-            },
-            'refresh'
-        );
+            const access_token = await this.jwtService.signToken(
+                {
+                    ...user,
+                    uuid: user.uuid,
+                    role: [1],
+                },
+                'access'
+            );
 
-        return createSuccessResponse(
-            {
-                data: {
+            const refresh_token = await this.jwtService.signToken(
+                {
+                    ...user,
+                    uuid: user.uuid,
+                    role: [1],
+                },
+                'refresh'
+            );
+
+            return createSuccessResponse(
+                {
                     access_token: access_token,
                     refresh_token: refresh_token,
                 },
-            },
-            'Login is'
-        );
+                'Login successful'
+            );
+        } catch (error) {
+            return createUnAuthorized(
+                'An error occurred while refreshing token'
+            );
+        }
     }
 }
