@@ -1,6 +1,7 @@
 import { Expose } from 'class-transformer';
-import { IsBoolean, IsNotEmpty, IsString } from 'class-validator';
+import { IsBoolean, IsEnum, IsNotEmpty, IsString } from 'class-validator';
 import e from 'express';
+import { Gender } from 'src/entities';
 
 export class GetUserDTO {
     @IsString()
@@ -25,8 +26,9 @@ export class UpdateProfileDTO {
     @Expose()
     summary: string;
 
-    @IsBoolean()
+    @IsString()
     @IsNotEmpty()
     @Expose()
-    gender: boolean;
+    @IsEnum(Gender)
+    gender: Gender;
 }

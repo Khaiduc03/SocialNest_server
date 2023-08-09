@@ -5,6 +5,11 @@ export enum UserRole {
     Admin = 'admin',
 }
 
+export enum Gender {
+    famale = 'famale',
+    male = 'male',
+}
+
 export enum newsStatus {
     Public = 'public',
     Private = 'private',

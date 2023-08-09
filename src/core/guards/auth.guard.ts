@@ -1,11 +1,11 @@
 import {
-    Injectable,
     CanActivate,
     ExecutionContext,
-    UnauthorizedException,
     HttpStatus,
+    Injectable,
+    UnauthorizedException,
 } from '@nestjs/common';
-import { resolve4 } from 'dns';
+
 import { Request, Response } from 'express';
 import { Observable } from 'rxjs';
 import { JWTService } from 'src/configs';
@@ -19,9 +19,7 @@ export class AuthGuard implements CanActivate {
     ): boolean | Promise<boolean> | Observable<boolean> {
         const request = context.switchToHttp().getRequest();
         const response = context.switchToHttp().getResponse();
-        const user = this.validateRequest(request, response);
-        //console.log(request['user']);
-        return user;
+        return this.validateRequest(request, response);
     }
 
     private async validateRequest(
@@ -39,13 +37,11 @@ export class AuthGuard implements CanActivate {
             if (!user) {
                 throw new UnauthorizedException('Unauthorized');
             }
-          
 
             request['user'] = user;
             //how to user request.user in controller
 
             //console.log(request['user']);
-
 
             return true;
         } catch (error) {

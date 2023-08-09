@@ -12,7 +12,7 @@ import {
 } from 'typeorm';
 import { Base } from './base';
 import { Expose, plainToClass } from 'class-transformer';
-import { UserRole } from './types';
+import { Gender, UserRole } from './types';
 import { Image } from './image.entity';
 
 @Entity({
@@ -51,8 +51,8 @@ export class User extends Base {
     summary: string;
 
     @Expose()
-    @Column({ type: 'boolean', default: 0 })
-    gender: boolean;
+    @Column({ type: 'enum',enum:Gender , nullable: true })
+    gender: Gender;
 
     @Expose()
     @Column({ type: 'boolean', default: false })
@@ -65,7 +65,7 @@ export class User extends Base {
     @Expose()
     @OneToOne(() => Image, (image) => image.uuid)
     @JoinColumn({ name: 'avatar_uuid', referencedColumnName: 'uuid' })
-    avatar: Image;
+    avatar: Partial<Image>;
 
     constructor(user: Partial<User>) {
         super(); // call constructor of BaseEntity

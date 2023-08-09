@@ -3,6 +3,7 @@ import {
     Controller,
     Delete,
     Get,
+    Param,
     Post,
     Put,
     Query,
@@ -28,16 +29,17 @@ export class UserController {
         return await this.userService.getAllUsers();
     }
 
-    @Get()
-    async getUserById(@Query('uuid') uuid: string): Promise<Http> {
-        return await this.userService.getUserById(uuid);
-    }
-
     @Get('profile')
     async getProfileUser(@Req() req: Request): Promise<Http> {
         const { uuid } = req['user'];
+        // console.log(uuid)
 
         return await this.userService.getProfileUser(uuid);
+    }
+
+    @Get(':uuid')
+    async getUserById(@Param('uuid') uuid: string): Promise<Http> {
+        return await this.userService.getUserById(uuid);
     }
 
     //update profile

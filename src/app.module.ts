@@ -15,9 +15,8 @@ import {
     NewsModule,
     ReCommentModule,
     TopicModule,
-    UserModule
+    UserModule,
 } from './modules';
-import { TestModule } from './modules/test/test.module';
 
 @Module({
     imports: [
@@ -48,8 +47,6 @@ import { TestModule } from './modules/test/test.module';
         ReCommentModule,
 
         FavoriteModule,
-
-        TestModule,
 
         CloudModule,
     ],

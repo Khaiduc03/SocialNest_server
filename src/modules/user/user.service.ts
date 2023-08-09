@@ -1,16 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from 'src/entities';
-import { Repository } from 'typeorm';
 import {
     Http,
     createBadRequset,
     createBadRequsetNoMess,
     createSuccessResponse,
 } from 'src/common';
+import { User } from 'src/entities';
+import { Repository } from 'typeorm';
 import { ImageService } from '../image';
 import { GetUserDTO, UpdateProfileDTO } from './dto';
-import { error } from 'console';
 
 @Injectable()
 export class UserService {
@@ -24,15 +23,9 @@ export class UserService {
     async getProfileUser(uuid: string): Promise<Http> {
         const profile = await this.userRepository
             .createQueryBuilder('user')
-            .leftJoinAndSelect('user.avatar', 'avatar')
-
+            .innerJoinAndSelect('user.avatar', 'avatar')
             .where('user.uuid = :uuid', { uuid })
             .getOne();
-
-        // const profile = await this.userRepository.findOne({
-        //     where: { uuid },
-
-        // });
 
         if (!profile) return createBadRequset('Get profile user');
         return createSuccessResponse(profile, 'Get profile user');
@@ -40,20 +33,46 @@ export class UserService {
 
     // get user by
     async getUserById(uuid: string): Promise<Http> {
-        const user = await this.userRepository
-            .createQueryBuilder(User.name.toLocaleLowerCase())
-            .where('user.uuid = :uuid', { uuid })
-            .leftJoinAndSelect('user.avatar', 'avatar')
-            .getOne();
-        if (!user) return createBadRequset('Get user by uuid');
-        return createSuccessResponse(user, 'Get user by uuid');
+        try {
+            const user = await this.userRepository
+                .createQueryBuilder(User.name.toLowerCase())
+                .where('user.uuid = :uuid', { uuid })
+                .leftJoinAndSelect('user.avatar', 'avatar')
+                .getOne();
+
+            if (!user) {
+                return createBadRequsetNoMess('User not found');
+            }
+
+            return createSuccessResponse(user, 'User retrieved successfully');
+        } catch (error) {
+            return createBadRequsetNoMess('User not found');
+        }
+    }
+
+    async getUserByuuiId(uuid: string): Promise<User> {
+        try {
+            const user = await this.userRepository
+                .createQueryBuilder(User.name.toLowerCase())
+                .where('user.uuid = :uuid', { uuid })
+                .leftJoinAndSelect('user.avatar', 'avatar')
+                .getOne();
+
+            if (!user) {
+                return undefined;
+            }
+
+            return user
+        } catch (error) {
+            return undefined;
+        }
     }
 
     // get users
     async getAllUsers(): Promise<Http> {
         const users = await this.userRepository.find();
-        if (!users) return createBadRequset('Get users');
-        return createSuccessResponse(users, 'Get users');
+        if (!users) return createBadRequset('Get users all');
+        return createSuccessResponse(users, 'Get users all');
     }
 
     // update profile
@@ -74,11 +93,13 @@ export class UserService {
         return createSuccessResponse(response, 'Update profile');
     }
 
-    //update avatar
+    //  update avatar
     async updateAvatar(
         uuid: string,
         avatar: Express.Multer.File
     ): Promise<Http> {
+        if (!avatar) return createBadRequsetNoMess('avatar is null');
+
         const isExist = await this.userRepository
             .createQueryBuilder('user')
             .where('user.uuid = :uuid', { uuid })
@@ -91,10 +112,6 @@ export class UserService {
             avatar,
             isExist.username
         );
-
-        // if (!uploaded) return createBadRequsetNoMess('here');
-        // const response = await this.userRepository.save(isExist);
-        // if (!response) return createBadRequset('Update avatar');
         return createSuccessResponse(uploaded, 'Update avatar');
     }
 
@@ -110,18 +127,20 @@ export class UserService {
         const deleted = await this.imageService.deleteAvatar(isExist.avatar);
 
         if (!deleted) return createBadRequset('Delete avatar');
-        console.log(deleted);
+        //console.log(deleted);
         return deleted;
     }
 
     // delete user by id
     async deleteUser(user: GetUserDTO): Promise<Http> {
-        const isExits = await this.userRepository.findOneBy({
-            uuid: user.uuid+'',
-        }).catch((error)=>{});
+        const isExits = await this.userRepository
+            .findOneBy({
+                uuid: user.uuid + '',
+            })
+            .catch((error) => {});
 
         if (!isExits) return createBadRequset('Delete user');
-        const deleted = await this.userRepository.remove( isExits);
+        const deleted = await this.userRepository.remove(isExits);
         if (!deleted) return createBadRequset('Delete user');
         return createSuccessResponse(deleted, 'Delete user');
     }

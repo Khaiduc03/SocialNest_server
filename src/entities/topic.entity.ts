@@ -16,9 +16,6 @@ export class Topic extends Base {
     @Column({ type: 'varchar', length: 255, nullable: false })
     name: string;
 
-    @Expose()
-    @ManyToOne(()=>News, (news)=>news.topic)
-    news: News;
     constructor(topic: Partial<Topic>) {
         super(); // call constructor of BaseEntity
         if (topic) {
