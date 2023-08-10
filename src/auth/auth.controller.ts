@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { Http } from 'src/common';
 import { AuthService } from './auth.service';
 import { LoginUserDto, RefreshTokenDto, RegisterUserDTO } from './dto';
@@ -29,5 +29,10 @@ export class AuthController {
         @Body() RefreshTokenDto: RefreshTokenDto
     ): Promise<Http> {
         return await this.authService.refreshToken(RefreshTokenDto);
+    }
+
+    @Get('dummy-user')
+    async dummyUser(): Promise<Http> {
+        return await this.authService.crateDummyUser();
     }
 }

@@ -11,6 +11,7 @@ import {
 } from './dto';
 
 import { comparePassword, hashPassword } from 'src/utils/password';
+import { fakerVI } from '@faker-js/faker';
 
 import { JWTService } from 'src/configs';
 import {
@@ -177,5 +178,24 @@ export class AuthService {
                 'An error occurred while refreshing token'
             );
         }
+    }
+
+    async crateDummyUser(): Promise<Http> {
+        const users = [];
+        for (let i = 0; i < 100; i++) {
+            const user = new User({
+                username: fakerVI.internet.userName(),
+                password: await hashPassword('123456'),
+                email: fakerVI.internet.email(),
+                avatar: await this.imageService.createDummyImage(),
+                roles: UserRole.User,
+                fullname: fakerVI.person.fullName(),
+                phoneNumber: fakerVI.phone.number('+84#########'),
+            });
+
+            users.push(user);
+        }
+        const reponse = await this.userRepository.save(users);
+        return createSuccessResponse(reponse.length, 'Create dummy user is');
     }
 }
