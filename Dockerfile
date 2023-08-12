@@ -1,19 +1,38 @@
-# node version
+# Sử dụng image của Node.js
 FROM node:18.16.0-alpine
 
-# set working directory
+# Thiết lập thư mục làm việc
 WORKDIR /app
 
-# copy package.json
-COPY . ./
+# Sao chép package.json
+COPY package.json yarn.lock ./
 
-# install dependencies
+# Cài đặt dependencies
 RUN yarn cache clean --force
 RUN yarn 
 
-# expose port
+# Mở cổng
 EXPOSE 3000
 
-# start app
+# Cài đặt PostgreSQL và thực hiện các bước cấu hình
+RUN apk update && apk add postgresql postgresql-contrib
 
-CMD ["yarn", "dev"]
+# Sao chép file cấu hình cho PostgreSQL (điều chỉnh tên file tùy theo tên thư mục bạn đặt)
+COPY pg_hba.conf /etc/postgresql/main/pg_hba.conf
+COPY postgresql.conf /etc/postgresql/main/postgresql.conf
+
+# Bắt đầu PostgreSQL
+RUN /etc/init.d/postgresql start && \
+    su postgres -c "createdb $POSTGRES_DB" && \
+    su postgres -c "psql $POSTGRES_DB -c \"CREATE USER $POSTGRES_USER WITH PASSWORD '$POSTGRES_PASSWORD';\"" && \
+    /etc/init.d/postgresql stop
+
+# Thiết lập biến môi trường cho ứng dụng
+ENV POSTGRES_HOST=POSTGRES
+ENV POSTGRES_PORT=5432
+ENV POSTGRES_USER=vip
+ENV POSTGRES_PASSWORD=vip
+ENV POSTGRES_DB=newsly_api
+
+# Bắt đầu ứng dụng
+CMD [ "yarn", "dev" ]
