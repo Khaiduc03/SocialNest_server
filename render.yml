@@ -1,0 +1,9 @@
+# render.yaml
+
+services:
+  - name: postgres
+    dockerfile: Dockerfile.postgres
+    env: .env
+  - name: app
+    dockerfile: Dockerfile
+    env: .env
