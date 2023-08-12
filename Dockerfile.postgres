@@ -1,0 +1,10 @@
+# Use the official PostgreSQL image
+FROM postgres:latest
+
+# Set environment variables for PostgreSQL
+ENV POSTGRES_USER=vip
+ENV POSTGRES_PASSWORD=vip
+ENV POSTGRES_DB=newsly_api
+
+# Expose PostgreSQL port
+EXPOSE 5432

@@ -13,14 +13,21 @@ export class CreateNewsDTO {
 
 export class UpdateNewsDTO {
     @IsNotEmpty()
+    @IsUUID()
+    uuid: string;
+
+    @IsNotEmpty()
     title: string;
 
     @IsNotEmpty()
-    content: string;
+    body: string;
+}
+
+export class UpdateStatusNewsDTO {
+    @IsNotEmpty()
+    @IsUUID()
+    uuid: string;
 
     @IsNotEmpty()
-    category: string;
-
-    @IsNotEmpty()
-    image: string;
+    status: string;
 }

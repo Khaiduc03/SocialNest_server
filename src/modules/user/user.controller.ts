@@ -31,8 +31,8 @@ export class UserController {
 
     @Get('profile')
     async getProfileUser(@Req() req: Request): Promise<Http> {
-        const { uuid } = req['user'];
-        // console.log(uuid)
+        const { uuid } = req.body.user;
+         console.log(uuid)
 
         return await this.userService.getProfileUser(uuid);
     }
@@ -48,23 +48,25 @@ export class UserController {
         @Req() req: Request,
         @Body() updateProfile: UpdateProfileDTO
     ): Promise<Http> {
-        const { uuid } = req['user'];
+        const { uuid } = req.body.user;
         return await this.userService.updateProfile(updateProfile, uuid);
     }
 
     @Put('avatar')
-    @UseInterceptors(FileInterceptor('avatar'))
+    @UseInterceptors(FileInterceptor('user'))
     async getAvatar(
         @Req() req: Request,
         @UploadedFile() avatar: Express.Multer.File
-    ): Promise<Http> {
-        const { uuid } = req['user'];
-        return await this.userService.updateAvatar(uuid, avatar);
+    ): Promise<any> {
+        console.log(req)
+        // const { uuid } = req['user'];
+        // console.log(uuid)
+        //return await this.userService.updateAvatar(uuid, avatar);
     }
 
     @Delete('avatar')
-    async deleteAvatar(@Req() body: Request): Promise<Http> {
-        const { uuid } = body['user'];
+    async deleteAvatar(@Req() req: Request): Promise<Http> {
+        const { uuid } = req.body.user;
 
         return await this.userService.deleteAvatar(uuid);
     }

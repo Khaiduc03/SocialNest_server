@@ -18,7 +18,10 @@ import { NewsService } from './news.service';
 import { Http } from 'src/common';
 import { CreateNewsDTO, UpdateNewsDTO } from './dto';
 import { Request } from 'express';
-import { FileFieldsInterceptor, FileInterceptor } from '@nestjs/platform-express';
+import {
+    FileFieldsInterceptor,
+    FileInterceptor,
+} from '@nestjs/platform-express';
 
 @Controller('news')
 @UseGuards(AuthGuard)
@@ -43,10 +46,20 @@ export class NewsController {
         @Req() req: Request,
         @UploadedFile() file: Express.Multer.File
     ): Promise<Http> {
-         const owner = req['user'];
-     
+        const owner = req.body.user;
+
         //if (!owner) throw new UnauthorizedException('Not found user');
-        return await this.newsService.createNews(owner,createNews, file);
+        return await this.newsService.createNews(owner, createNews, file);
+    }
+
+    @Put()
+    async updateNews(
+        //@Body() updateNews: UpdateNewsDTO,
+        @Req() req: Request
+    ): Promise<any> {
+        const user: any = req.body.user;
+        console.log(user);
+        // return await this.newsService.updateNews(updateNews);
     }
 
     // @Put(':uuid')

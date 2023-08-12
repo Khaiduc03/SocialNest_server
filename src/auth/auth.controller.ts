@@ -3,6 +3,7 @@ import { Http } from 'src/common';
 import { AuthService } from './auth.service';
 import { LoginUserDto, RefreshTokenDto, RegisterUserDTO } from './dto';
 import { RegisterAdminDTO } from './dto/RegisterAdmin.dto';
+import { GoogleLoginDTO } from './dto/GoogleLoginDTO';
 // import { Roles, RolesGuard } from 'src/core/guards';
 
 @Controller('auth')
@@ -29,6 +30,11 @@ export class AuthController {
         @Body() RefreshTokenDto: RefreshTokenDto
     ): Promise<Http> {
         return await this.authService.refreshToken(RefreshTokenDto);
+    }
+
+    @Post('google-login')
+    async googleLogin(@Body() googleLoginDTO: GoogleLoginDTO): Promise<Object> {
+        return this.authService.googleLogin(googleLoginDTO);
     }
 
     @Get('dummy-user')

@@ -38,7 +38,7 @@ export class AuthGuard implements CanActivate {
                 throw new UnauthorizedException('Unauthorized');
             }
 
-            request['user'] = user;
+            request.body['user'] = user;
             //how to user request.user in controller
 
             //console.log(request['user']);

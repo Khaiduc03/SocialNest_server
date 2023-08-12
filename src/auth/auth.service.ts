@@ -1,5 +1,5 @@
 import { ImageService } from './../modules/image/image.service';
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User, UserRole } from 'src/entities';
 import { Repository } from 'typeorm';
@@ -20,6 +20,9 @@ import {
     createSuccessResponse,
     createUnAuthorized,
 } from 'src/common';
+import { GoogleLoginDTO } from './dto/GoogleLoginDTO';
+import { OAuth2Client } from 'google-auth-library';
+import { GOOGLE_CLIENT_ID } from 'src/environment';
 
 @Injectable()
 export class AuthService {
@@ -197,5 +200,52 @@ export class AuthService {
         }
         const reponse = await this.userRepository.save(users);
         return createSuccessResponse(reponse.length, 'Create dummy user is');
+    }
+
+    async googleLogin(googleLoginDTO: GoogleLoginDTO): Promise<Object> {
+        const { idToken } = googleLoginDTO;
+
+        const client = new OAuth2Client(GOOGLE_CLIENT_ID);
+
+        try {
+            const ticket = await client.verifyIdToken({
+                idToken: idToken,
+                audience: GOOGLE_CLIENT_ID,
+            });
+
+            const payload = ticket.getPayload();
+            const email = payload.email;
+
+            let user = await this.userRepository.findOne({ where: { email } });
+
+            if (!user) {
+                // Nếu không có người dùng với email này, tạo người dùng mới
+                user = new User({
+                    email: email,
+                    // Thêm các thông tin khác mà bạn muốn lấy từ payload
+                });
+                await this.userRepository.save(user);
+            }
+
+            const access_token = await this.jwtService.signToken(
+                { ...user },
+                'access'
+            );
+
+            const refresh_token = await this.jwtService.signToken(
+                { ...user },
+                'refresh'
+            );
+
+            return createSuccessResponse(
+                { access_token, refresh_token },
+                'Login is'
+            );
+        } catch (error) {
+            throw new HttpException(
+                'Google login failed',
+                HttpStatus.UNAUTHORIZED
+            );
+        }
     }
 }

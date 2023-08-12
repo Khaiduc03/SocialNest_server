@@ -28,6 +28,8 @@ const CLOUD_NAME: string = process.env.CLOUD_NAME;
 const API_KEY: string = process.env.API_KEY;
 const API_SECRET: string = process.env.API_SECRET;
 
+//google
+const GOOGLE_CLIENT_ID: string = process.env.GOOGLE_CLIENT_ID;
 
 export {
     NODE_ENV,
@@ -44,5 +46,6 @@ export {
     REFRESH_TOKEN_EXPIRATION_TIME,
     CLOUD_NAME,
     API_KEY,
-    API_SECRET
+    API_SECRET,
+    GOOGLE_CLIENT_ID
 };
