@@ -110,8 +110,13 @@ export class ImageService {
         return createSuccessResponse(image, 'Get images');
     }
 
-    async createImage(): Promise<Image> {
-        const image = new Image({});
+    async createImage(url?: string): Promise<Image> {
+        console.log(url)
+        const image = new Image({
+            public_id: url,
+            url: url,
+            secure_url: url,
+        });
         const response = await this.imageRepository.save(image);
         return response;
     }

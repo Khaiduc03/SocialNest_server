@@ -19,6 +19,8 @@ export class AuthGuard implements CanActivate {
     ): boolean | Promise<boolean> | Observable<boolean> {
         const request = context.switchToHttp().getRequest();
         const response = context.switchToHttp().getResponse();
+
+
         return this.validateRequest(request, response);
     }
 
@@ -38,10 +40,7 @@ export class AuthGuard implements CanActivate {
                 throw new UnauthorizedException('Unauthorized');
             }
 
-            request.body['user'] = user;
-            //how to user request.user in controller
-
-            //console.log(request['user']);
+            request['user'] = user;
 
             return true;
         } catch (error) {

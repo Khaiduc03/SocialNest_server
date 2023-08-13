@@ -23,7 +23,7 @@ import { Image } from './image.entity';
 })
 export class User extends Base {
     @Expose()
-    @Column({ type: 'varchar', length: 255, unique: true })
+    @Column({ type: 'varchar', length: 255, unique: true , nullable: true})
     username: string;
 
     @Expose()

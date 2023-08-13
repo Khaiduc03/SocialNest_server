@@ -31,3 +31,10 @@ export class UpdateStatusNewsDTO {
     @IsNotEmpty()
     status: string;
 }
+
+export class  UuidDTO {
+    @IsNotEmpty()
+    @IsUUID()
+    uuid: string;
+}
+

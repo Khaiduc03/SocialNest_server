@@ -40,7 +40,7 @@ export class News extends Base {
 
     @Expose()
     @ManyToOne(() => User, (user) => user.uuid ,{cascade: true})
-    @JoinColumn({ name: 'owner_uuid', referencedColumnName: 'uuid'  })
+    @JoinColumn({ name: 'owner', referencedColumnName: 'uuid'  })
     owner: Partial<User>;
 
     @Expose()

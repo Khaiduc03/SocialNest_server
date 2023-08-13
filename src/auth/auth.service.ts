@@ -214,17 +214,19 @@ export class AuthService {
             });
 
             const payload = ticket.getPayload();
+            console.log(payload);
             const email = payload.email;
 
             let user = await this.userRepository.findOne({ where: { email } });
 
             if (!user) {
-                // Nếu không có người dùng với email này, tạo người dùng mới
                 user = new User({
                     email: email,
-                    // Thêm các thông tin khác mà bạn muốn lấy từ payload
+                    avatar: await this.imageService.createImage(payload.picture),
                 });
-                await this.userRepository.save(user);
+                // console.log(user)
+                const reponse = await this.userRepository.save(user);
+                console.log(reponse);
             }
 
             const access_token = await this.jwtService.signToken(

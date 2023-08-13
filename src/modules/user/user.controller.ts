@@ -31,8 +31,8 @@ export class UserController {
 
     @Get('profile')
     async getProfileUser(@Req() req: Request): Promise<Http> {
-        const { uuid } = req.body.user;
-         console.log(uuid)
+        const { uuid } = req['user'];
+        console.log(uuid);
 
         return await this.userService.getProfileUser(uuid);
     }
@@ -48,7 +48,7 @@ export class UserController {
         @Req() req: Request,
         @Body() updateProfile: UpdateProfileDTO
     ): Promise<Http> {
-        const { uuid } = req.body.user;
+        const { uuid } = req['user'];
         return await this.userService.updateProfile(updateProfile, uuid);
     }
 
@@ -58,7 +58,7 @@ export class UserController {
         @Req() req: Request,
         @UploadedFile() avatar: Express.Multer.File
     ): Promise<any> {
-        console.log(req)
+        console.log(req);
         // const { uuid } = req['user'];
         // console.log(uuid)
         //return await this.userService.updateAvatar(uuid, avatar);
@@ -66,7 +66,7 @@ export class UserController {
 
     @Delete('avatar')
     async deleteAvatar(@Req() req: Request): Promise<Http> {
-        const { uuid } = req.body.user;
+        const { uuid } = req['user'];
 
         return await this.userService.deleteAvatar(uuid);
     }

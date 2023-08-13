@@ -9,19 +9,15 @@ import {
     Req,
     UnauthorizedException,
     UploadedFile,
-    UploadedFiles,
     UseGuards,
     UseInterceptors,
 } from '@nestjs/common';
-import { AuthGuard, RolesGuard } from 'src/core';
-import { NewsService } from './news.service';
-import { Http } from 'src/common';
-import { CreateNewsDTO, UpdateNewsDTO } from './dto';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { Request } from 'express';
-import {
-    FileFieldsInterceptor,
-    FileInterceptor,
-} from '@nestjs/platform-express';
+import { Http } from 'src/common';
+import { AuthGuard } from 'src/core';
+import { CreateNewsDTO, UpdateNewsDTO, UuidDTO } from './dto';
+import { NewsService } from './news.service';
 
 @Controller('news')
 @UseGuards(AuthGuard)
@@ -45,33 +41,25 @@ export class NewsController {
         @Body() createNews: CreateNewsDTO,
         @Req() req: Request,
         @UploadedFile() file: Express.Multer.File
-    ): Promise<Http> {
-        const owner = req.body.user;
-
-        //if (!owner) throw new UnauthorizedException('Not found user');
+    ): Promise<any> {
+        const owner = req['user'];
+        if (!owner) throw new UnauthorizedException('Not found user');
         return await this.newsService.createNews(owner, createNews, file);
     }
 
     @Put()
+    @UseInterceptors(FileInterceptor('image'))
     async updateNews(
-        //@Body() updateNews: UpdateNewsDTO,
+        @Body() updateNews: UpdateNewsDTO,
         @Req() req: Request
     ): Promise<any> {
-        const user: any = req.body.user;
-        console.log(user);
-        // return await this.newsService.updateNews(updateNews);
+        const user = req['user'];
+        return await this.newsService.updateNews(user.uuid, updateNews);
     }
 
-    // @Put(':uuid')
-    // async updateNews(
-    //     @Param('uuid') uuid: string,
-    //     @Body() updateNews: UpdateNewsDTO
-    // ): Promise<Http> {
-    //     return await this.newsService.updateNews(uuid, updateNews);
-    // }
-
-    // @Delete(':uuid')
-    // async deleteNews(@Param('uuid') uuid: string): Promise<Http> {
-    //     return await this.newsService.deleteNews(uuid);
-    // }
+    @Delete()
+    async deleteNews(@Req() req: Request, @Body() uuid: UuidDTO): Promise<any> {
+        const user = req['user'];
+        return await this.newsService.deleteNews(user.uuid, uuid);
+    }
 }
