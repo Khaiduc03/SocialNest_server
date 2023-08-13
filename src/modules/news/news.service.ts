@@ -158,4 +158,10 @@ export class NewsService {
             'Delete news successfully'
         );
     }
+
+    async createDummyNEews(): Promise<any> {
+        
+    
+    }
+
 }
