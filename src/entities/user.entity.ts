@@ -23,12 +23,8 @@ import { Image } from './image.entity';
 })
 export class User extends Base {
     @Expose()
-    @Column({ type: 'varchar', length: 255, unique: true , nullable: true})
-    username: string;
-
-    @Expose()
     @Column({ type: 'varchar', length: 255, default: '' })
-    password: string;
+    password:Partial<string>;
 
     @Expose()
     @Column({ type: 'varchar', length: 255, unique: true, default: null })
@@ -51,7 +47,7 @@ export class User extends Base {
     summary: string;
 
     @Expose()
-    @Column({ type: 'enum',enum:Gender , nullable: true })
+    @Column({ type: 'enum', enum: Gender, nullable: true })
     gender: Gender;
 
     @Expose()

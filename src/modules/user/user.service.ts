@@ -28,7 +28,11 @@ export class UserService {
             .getOne();
 
         if (!profile) return createBadRequset('Get profile user');
-        return createSuccessResponse(profile, 'Get profile user');
+        const { password, ...profileWithoutPassword } = profile;
+        return createSuccessResponse(
+            profileWithoutPassword,
+            'Get profile user'
+        );
     }
 
     // get user by
@@ -62,7 +66,7 @@ export class UserService {
                 return undefined;
             }
 
-            return user
+            return user;
         } catch (error) {
             return undefined;
         }
@@ -70,9 +74,18 @@ export class UserService {
 
     // get users
     async getAllUsers(): Promise<Http> {
-        const users = await this.userRepository.find();
+        const users = await this.userRepository.find({
+            relations: ['avatar'],
+        });
         if (!users) return createBadRequset('Get users all');
-        return createSuccessResponse(users, 'Get users all');
+        const response = users.map((user) => {
+            const { password, ...profileWithoutPassword } = user;
+            return {
+                ...profileWithoutPassword,
+            };
+        });
+
+        return createSuccessResponse(response, 'Get users all');
     }
 
     // update profile
@@ -99,7 +112,7 @@ export class UserService {
         avatar: Express.Multer.File
     ): Promise<Http> {
         if (!avatar) return createBadRequsetNoMess('avatar is null');
-        console.log(uuid)
+        console.log(uuid);
         const isExist = await this.userRepository
             .createQueryBuilder('user')
             .where('user.uuid = :uuid', { uuid })
@@ -110,7 +123,7 @@ export class UserService {
         const uploaded = await this.imageService.updateAvatar(
             isExist.avatar,
             avatar,
-            isExist.username
+            isExist.email
         );
         return createSuccessResponse(uploaded, 'Update avatar');
     }

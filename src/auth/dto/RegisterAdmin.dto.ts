@@ -10,8 +10,9 @@ export class RegisterAdminDTO {
     // email: string;
 
     @IsString()
+    @IsEmail()
     @Expose()
-    username: string;
+    email: string;
 
     @IsString()
     @IsNotEmpty()

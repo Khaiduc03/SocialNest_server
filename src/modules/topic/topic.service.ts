@@ -27,6 +27,15 @@ export class TopicService {
         return createSuccessResponse(response, 'Get all topic');
     }
 
+    async getTopics(): Promise<Topic[]> {
+        const response = await this.topicRepository.find();
+        if (!response) return null
+        if (response.length === 0)
+            return null
+
+        return response;
+    }
+
     async getTopicById(uuid: string): Promise<Topic> {
       const response = await this.topicRepository
         .findOne({

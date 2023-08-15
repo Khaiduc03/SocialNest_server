@@ -15,6 +15,7 @@ export class RegisterUserDTO {
 
     @IsString()
     @IsNotEmpty()
+    @IsEmail()
     @Expose()
-    username: string;
+    email: string;
 }

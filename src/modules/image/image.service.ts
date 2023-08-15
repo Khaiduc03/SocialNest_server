@@ -8,10 +8,11 @@ import {
     createBadRequsetNoMess,
     createSuccessResponse,
 } from 'src/common';
-import { Image } from 'src/entities/image.entity';
+
 import { Repository } from 'typeorm';
 import { CloudService } from '../cloud';
-import { fakerVI } from '@faker-js/faker';
+import { faker, fakerVI } from '@faker-js/faker';
+import { Image } from 'src/entities';
 @Injectable()
 export class ImageService {
     constructor(
@@ -111,7 +112,7 @@ export class ImageService {
     }
 
     async createImage(url?: string): Promise<Image> {
-        console.log(url)
+        console.log(url);
         const image = new Image({
             public_id: url,
             url: url,
@@ -121,15 +122,15 @@ export class ImageService {
         return response;
     }
 
-    async createDummyImage(): Promise<Image> {
+    async createDummyImage(): Promise<Image | undefined> {
         const image = new Image({
             public_id: fakerVI.image.avatar(),
             url: fakerVI.image.avatar(),
             secure_url: fakerVI.image.avatar(),
         });
-        const response = await this.imageRepository.save(image);
-        return response;
+        return await this.imageRepository.save(image);
     }
+
 
     async updateAvatar(
         avatar: Partial<Image>,

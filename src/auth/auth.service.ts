@@ -17,6 +17,7 @@ import { JWTService } from 'src/configs';
 import {
     Http,
     createBadRequset,
+    createBadRequsetNoMess,
     createSuccessResponse,
     createUnAuthorized,
 } from 'src/common';
@@ -35,11 +36,11 @@ export class AuthService {
 
     //register
     async register(registerDTO: RegisterUserDTO): Promise<Http> {
-        let userNameIsExist = await this.userRepository.findOne({
-            where: { username: registerDTO.username },
+        let emailIsExist = await this.userRepository.findOne({
+            where: { email: registerDTO.email },
         });
-        if (userNameIsExist)
-            return createBadRequset('Username already exists so register');
+        if (emailIsExist)
+            return createBadRequset('email already exists so register');
 
         const password = await hashPassword(registerDTO.password);
 
@@ -60,11 +61,11 @@ export class AuthService {
     }
 
     async registerAdmin(registerDTO: RegisterAdminDTO): Promise<Http> {
-        let userNameIsExist = await this.userRepository.findOne({
-            where: { username: registerDTO.username },
+        let emailIsExist = await this.userRepository.findOne({
+            where: { email: registerDTO.email },
         });
-        if (userNameIsExist)
-            return createBadRequset('Username already exists so register');
+        if (emailIsExist)
+            return createBadRequset('email already exists so register');
 
         const password = await hashPassword(registerDTO.password);
 
@@ -84,40 +85,40 @@ export class AuthService {
     }
 
     async login(loginUserDTO: LoginUserDto): Promise<Object> {
-        const userNameIsExist = await this.userRepository.findOne({
-            where: { username: loginUserDTO.username },
+        const emailIsExist = await this.userRepository.findOne({
+            where: { email: loginUserDTO.email },
         });
 
-        if (!userNameIsExist) return createBadRequset('Username is not exist');
+        if (!emailIsExist) return createBadRequsetNoMess('email is not exist');
         const isMatch = await comparePassword(
             loginUserDTO.password,
-            userNameIsExist.password
+            emailIsExist.password
         );
-        if (!isMatch) return createBadRequset('Password is not match');
+        if (!isMatch) return createBadRequsetNoMess('Password is not match');
 
         const device_token = loginUserDTO.device_token;
 
         await this.userRepository.update(
-            { username: loginUserDTO.username },
+            { email: loginUserDTO.email },
             { device_token: device_token }
         );
 
         const access_token = await this.jwtService.signToken(
             {
-                ...userNameIsExist,
+                ...emailIsExist,
                 device_token: device_token,
-                uuid: userNameIsExist.uuid,
-                roles: userNameIsExist.roles,
+                uuid: emailIsExist.uuid,
+                roles: emailIsExist.roles,
             },
             'access'
         );
 
         const refresh_token = await this.jwtService.signToken(
             {
-                ...userNameIsExist,
+                ...emailIsExist,
                 device_token: device_token,
-                uuid: userNameIsExist.uuid,
-                roles: userNameIsExist.roles,
+                uuid: emailIsExist.uuid,
+                roles: emailIsExist.roles,
             },
             'refresh'
         );
@@ -187,9 +188,8 @@ export class AuthService {
         const users = [];
         for (let i = 0; i < 100; i++) {
             const user = new User({
-                username: fakerVI.internet.userName(),
-                password: await hashPassword('123456'),
                 email: fakerVI.internet.email(),
+                password: await hashPassword('123456'),
                 avatar: await this.imageService.createDummyImage(),
                 roles: UserRole.User,
                 fullname: fakerVI.person.fullName(),
@@ -203,7 +203,7 @@ export class AuthService {
     }
 
     async googleLogin(googleLoginDTO: GoogleLoginDTO): Promise<Object> {
-        const { idToken } = googleLoginDTO;
+        const { idToken, device_token } = googleLoginDTO;
 
         const client = new OAuth2Client(GOOGLE_CLIENT_ID);
 
@@ -214,7 +214,6 @@ export class AuthService {
             });
 
             const payload = ticket.getPayload();
-            console.log(payload);
             const email = payload.email;
 
             let user = await this.userRepository.findOne({ where: { email } });
@@ -222,12 +221,21 @@ export class AuthService {
             if (!user) {
                 user = new User({
                     email: email,
-                    avatar: await this.imageService.createImage(payload.picture),
+                    avatar: await this.imageService.createImage(
+                        payload.picture
+                    ),
                 });
-                // console.log(user)
-                const reponse = await this.userRepository.save(user);
-                console.log(reponse);
+                await this.userRepository.update(
+                    { email: email },
+                    { device_token: device_token }
+                );
+                await this.userRepository.save(user);
             }
+
+            await this.userRepository.update(
+                { email: email },
+                { device_token: device_token }
+            );
 
             const access_token = await this.jwtService.signToken(
                 { ...user },

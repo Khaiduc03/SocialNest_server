@@ -10,9 +10,10 @@ import {
     OneToOne,
 } from 'typeorm';
 import { newsStatus } from './types';
-import { Image } from './image.entity';
+
 import { User } from './user.entity';
 import { Topic } from './topic.entity';
+import { Image } from './image.entity';
 
 @Entity({
     name: News.name.toLowerCase(),
@@ -35,16 +36,17 @@ export class News extends Base {
 
     @Expose()
     @OneToOne(() => Image, (image) => image.uuid)
-    @JoinColumn()
+    @JoinColumn({ name: 'image_uuid', referencedColumnName: 'uuid' })
     image: Partial<Image>;
 
+
     @Expose()
-    @ManyToOne(() => User, (user) => user.uuid ,{cascade: true})
-    @JoinColumn({ name: 'owner', referencedColumnName: 'uuid'  })
+    @ManyToOne(() => User, (user) => user.uuid)
+    @JoinColumn({ name: 'owner', referencedColumnName: 'uuid' })
     owner: Partial<User>;
 
     @Expose()
-   @Column({ type: 'simple-array', nullable: true , } )
+    @Column({ type: 'simple-array', nullable: true })
     topic: string[];
 
     constructor(news: Partial<News>) {

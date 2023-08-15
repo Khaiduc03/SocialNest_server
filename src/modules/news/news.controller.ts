@@ -30,7 +30,7 @@ export class NewsController {
         return await this.newsService.getAllNews();
     }
 
-    @Get(':uuid')
+    @Get('/id:uuid')
     async getNewsById(@Param('uuid') uuid: string): Promise<Http> {
         return await this.newsService.getNewsById(uuid);
     }
@@ -61,5 +61,13 @@ export class NewsController {
     async deleteNews(@Req() req: Request, @Body() uuid: UuidDTO): Promise<any> {
         const user = req['user'];
         return await this.newsService.deleteNews(user.uuid, uuid);
+    }
+
+
+    @Get('dummy-news')
+    async dummyNews(@Req() req:Request): Promise<any> {
+        const user = req['user'];
+       
+        return await this.newsService.createDummyNEews(user.uuid);
     }
 }

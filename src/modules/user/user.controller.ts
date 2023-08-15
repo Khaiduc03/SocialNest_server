@@ -32,7 +32,6 @@ export class UserController {
     @Get('profile')
     async getProfileUser(@Req() req: Request): Promise<Http> {
         const { uuid } = req['user'];
-        console.log(uuid);
 
         return await this.userService.getProfileUser(uuid);
     }
