@@ -152,7 +152,7 @@ export class ImageService {
         avatar.url = uploaded.url;
         avatar.secure_url = uploaded.secure_url;
         const response = await this.imageRepository.save(avatar);
-        console.log(response);
+        
 
         return response;
     }

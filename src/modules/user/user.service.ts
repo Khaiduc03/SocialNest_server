@@ -122,7 +122,7 @@ export class UserService {
         avatar: Express.Multer.File
     ): Promise<Http> {
         if (!avatar) return createBadRequsetNoMess('avatar is null');
-        console.log(uuid);
+        //console.log(uuid);
         const isExist = await this.userRepository
             .createQueryBuilder('user')
             .where('user.uuid = :uuid', { uuid })
