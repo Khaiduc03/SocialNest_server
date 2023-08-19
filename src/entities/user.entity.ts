@@ -47,6 +47,10 @@ export class User extends Base {
     summary: string;
 
     @Expose()
+    @Column({ type: 'date', nullable: true })
+    dob: string;
+
+    @Expose()
     @Column({ type: 'enum', enum: Gender, nullable: true })
     gender: Gender;
 
@@ -62,6 +66,14 @@ export class User extends Base {
     @OneToOne(() => Image, (image) => image.uuid)
     @JoinColumn({ name: 'avatar_uuid', referencedColumnName: 'uuid' })
     avatar: Partial<Image>;
+
+    @Expose()
+    @Column({ type: 'boolean', default: false })
+    isUpdate: boolean;
+
+    @Expose()
+    @Column({ type: 'boolean', default: false })
+    isUpdatePassword: boolean;
 
     constructor(user: Partial<User>) {
         super(); // call constructor of BaseEntity

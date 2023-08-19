@@ -31,4 +31,10 @@ export class UpdateProfileDTO {
     @Expose()
     @IsEnum(Gender)
     gender: Gender;
+
+    @IsString()
+    @IsNotEmpty()
+    @Expose()
+    dob: string;
+
 }

@@ -131,7 +131,6 @@ export class ImageService {
         return await this.imageRepository.save(image);
     }
 
-
     async updateAvatar(
         avatar: Partial<Image>,
         file: Express.Multer.File,
@@ -143,11 +142,18 @@ export class ImageService {
 
         const uploaded = await this.uploadAvatarToCloud(file, folder);
         if (!uploaded) return null;
-        const response = await this.imageRepository.update(avatar.uuid, {
-            public_id: uploaded.public_id,
-            url: uploaded.url,
-            secure_url: uploaded.secure_url,
-        });
+        // const response = await this.imageRepository.update(avatar.uuid, {
+        //     public_id: uploaded.public_id,
+        //     url: uploaded.url,
+        //     secure_url: uploaded.secure_url,
+        // });
+        // console.log(response)
+        avatar.public_id = uploaded.public_id;
+        avatar.url = uploaded.url;
+        avatar.secure_url = uploaded.secure_url;
+        const response = await this.imageRepository.save(avatar);
+        console.log(response);
+
         return response;
     }
 

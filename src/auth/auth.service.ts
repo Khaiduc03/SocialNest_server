@@ -81,7 +81,10 @@ export class AuthService {
 
         if (!response) return createBadRequset('Register is');
 
-        return createSuccessResponse(response, 'Register is');
+        return createSuccessResponse(
+            `Register successfull with email  ${response.email}`,
+            'Register is'
+        );
     }
 
     async login(loginUserDTO: LoginUserDto): Promise<Object> {
@@ -100,7 +103,7 @@ export class AuthService {
 
         await this.userRepository.update(
             { email: loginUserDTO.email },
-            { device_token: device_token }
+            { device_token: device_token, isUpdatePassword: true, status: true }
         );
 
         const access_token = await this.jwtService.signToken(
@@ -124,7 +127,7 @@ export class AuthService {
         );
 
         return createSuccessResponse(
-            { access_token, refresh_token },
+            { access_token, refresh_token, isUpdate: emailIsExist.isUpdate },
             'Login is'
         );
     }
@@ -227,7 +230,9 @@ export class AuthService {
                 });
                 await this.userRepository.update(
                     { email: email },
-                    { device_token: device_token }
+                    { device_token: device_token,isUpdate:true , status:true},
+                    
+                 
                 );
                 await this.userRepository.save(user);
             }
@@ -248,7 +253,11 @@ export class AuthService {
             );
 
             return createSuccessResponse(
-                { access_token, refresh_token },
+                {
+                    access_token,
+                    refresh_token,
+                    isUpdatePassword: user.isUpdatePassword,
+                },
                 'Login is'
             );
         } catch (error) {
@@ -258,4 +267,7 @@ export class AuthService {
             );
         }
     }
+
+    
+
 }

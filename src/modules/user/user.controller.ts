@@ -42,17 +42,19 @@ export class UserController {
     }
 
     //update profile
-    @Post('profile')
+    @Put('profile')
+    @UseInterceptors(FileInterceptor('avatar'))
     async updateProfile(
         @Req() req: Request,
-        @Body() updateProfile: UpdateProfileDTO
+        @Body() updateProfile: UpdateProfileDTO,
+        @UploadedFile() avatar: Express.Multer.File
     ): Promise<Http> {
         const { uuid } = req['user'];
-        return await this.userService.updateProfile(updateProfile, uuid);
+        return await this.userService.updateProfile(updateProfile, uuid, avatar);
     }
 
     @Put('avatar')
-    @UseInterceptors(FileInterceptor('user'))
+    @UseInterceptors(FileInterceptor('avatar'))
     async getAvatar(
         @Req() req: Request,
         @UploadedFile() avatar: Express.Multer.File

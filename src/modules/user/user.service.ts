@@ -91,16 +91,26 @@ export class UserService {
     // update profile
     async updateProfile(
         updateProfile: UpdateProfileDTO,
-        uuid: string
+        uuid: string,
+        avatar: Express.Multer.File
     ): Promise<Http> {
         const isExist = await this.userRepository
             .createQueryBuilder('user')
             .where('user.uuid = :uuid', { uuid })
+            .leftJoinAndSelect('user.avatar', 'avatar')
             .getOne();
         if (!isExist) return createBadRequset('Update profile');
+
+        const uploaded = await this.imageService.updateAvatar(
+            isExist.avatar,
+            avatar,
+            isExist.email
+        );
+
         const response = await this.userRepository.save({
             ...isExist,
             ...updateProfile,
+            avatar: avatar ? uploaded : isExist.avatar,
         });
         if (!response) return createBadRequset('Update profile');
         return createSuccessResponse(response, 'Update profile');
