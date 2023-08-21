@@ -57,7 +57,30 @@ export class AuthService {
 
         if (!response) return createBadRequset('Register is');
 
-        return createSuccessResponse(response, 'Register is');
+        const access_token = await this.jwtService.signToken(
+            {
+                ...response,
+                device_token: response.device_token,
+                uuid: response.uuid,
+                roles: response.roles,
+            },
+            'access'
+        );
+
+        const refresh_token = await this.jwtService.signToken(
+            {
+                ...response,
+                device_token: response.device_token,
+                uuid: response.uuid,
+                roles: response.roles,
+            },
+            'refresh'
+        );
+
+        return createSuccessResponse(
+            { access_token, refresh_token, isUpdate: response.isUpdate },
+            'Regist is'
+        );
     }
 
     async registerAdmin(registerDTO: RegisterAdminDTO): Promise<Http> {
@@ -97,7 +120,9 @@ export class AuthService {
             loginUserDTO.password,
             emailIsExist.password
         );
-        if (!isMatch) return createBadRequsetNoMess('Password is not match');
+
+        console.log(isMatch)
+        if (!isMatch) return createBadRequsetNoMess('Password is wrong!!');
 
         const device_token = loginUserDTO.device_token;
 
@@ -230,9 +255,7 @@ export class AuthService {
                 });
                 await this.userRepository.update(
                     { email: email },
-                    { device_token: device_token,isUpdate:true , status:true},
-                    
-                 
+                    { device_token: device_token, isUpdate: true, status: true }
                 );
                 await this.userRepository.save(user);
             }
@@ -267,7 +290,4 @@ export class AuthService {
             );
         }
     }
-
-    
-
 }

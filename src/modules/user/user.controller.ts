@@ -48,13 +48,15 @@ export class UserController {
         @Req() req: Request,
         @Body() updateProfile: UpdateProfileDTO,
         @UploadedFile() avatar: Express.Multer.File
-    ): Promise<Http> {
-        const { uuid } = req['user'];
-        return await this.userService.updateProfile(
-            updateProfile,
-            uuid,
-            avatar
-        );
+    ): Promise<any> {
+        // const { uuid } = req['user'];
+        // // return await this.userService.updateProfile(
+        // //     updateProfile,
+        // //     uuid,
+        // //     avatar
+        // // );
+        console.log(req['file'])
+
     }
 
     @Put('avatar')
@@ -63,8 +65,9 @@ export class UserController {
         @Req() req: Request,
         @UploadedFile() avatar: Express.Multer.File
     ): Promise<any> {
+       
         const { uuid } = req['user'];
-        console.log(uuid);
+    
         return await this.userService.updateAvatar(uuid, avatar);
     }
 

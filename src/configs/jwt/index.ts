@@ -56,7 +56,7 @@ export class JWTService {
             };
             try {
                 const payload = this.jwtService.verify(token, options);
-                console.log(payload)
+                //console.log(payload)
                 resolve(payload);
             } catch (error: any) {
                 reject(error);
