@@ -19,12 +19,7 @@ export class UpdateProfileDTO {
     @IsString()
     @IsNotEmpty()
     @Expose()
-    phone: string;
-
-    @IsString()
-    @IsNotEmpty()
-    @Expose()
-    summary: string;
+    phoneNumber: string;
 
     @IsString()
     @IsNotEmpty()
@@ -36,5 +31,4 @@ export class UpdateProfileDTO {
     @IsNotEmpty()
     @Expose()
     dob: string;
-
 }

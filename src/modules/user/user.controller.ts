@@ -43,31 +43,23 @@ export class UserController {
 
     //update profile
     @Put('profile')
-    @UseInterceptors(FileInterceptor('avatar'))
     async updateProfile(
         @Req() req: Request,
-        @Body() updateProfile: UpdateProfileDTO,
-        @UploadedFile() avatar: Express.Multer.File
+        @Body() updateProfile: UpdateProfileDTO
     ): Promise<any> {
-        // const { uuid } = req['user'];
-        // // return await this.userService.updateProfile(
-        // //     updateProfile,
-        // //     uuid,
-        // //     avatar
-        // // );
-        console.log(req['file'])
-
+        const { uuid } = req['user'];
+        return await this.userService.updateProfile(updateProfile, uuid);
+        // console.log(req['file'])
     }
 
     @Put('avatar')
-    @UseInterceptors(FileInterceptor('avatar'))
+    @UseInterceptors(FileInterceptor('image'))
     async getAvatar(
         @Req() req: Request,
         @UploadedFile() avatar: Express.Multer.File
     ): Promise<any> {
-       
         const { uuid } = req['user'];
-    
+
         return await this.userService.updateAvatar(uuid, avatar);
     }
 
