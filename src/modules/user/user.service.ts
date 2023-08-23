@@ -111,6 +111,7 @@ export class UserService {
             ...isExist,
             ...updateProfile,
             avatar: avatar ? uploaded : isExist.avatar,
+            isUpdate: true,
         });
         if (!response) return createBadRequset('Update profile');
         return createSuccessResponse(response, 'Update profile');
@@ -151,7 +152,7 @@ export class UserService {
 
         if (!deleted) return createBadRequset('Delete avatar');
         //console.log(deleted);
-        return deleted;
+        return createSuccessResponse(deleted, 'Delete avatar');
     }
 
     // delete user by id

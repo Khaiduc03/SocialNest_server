@@ -152,27 +152,26 @@ export class ImageService {
         avatar.url = uploaded.url;
         avatar.secure_url = uploaded.secure_url;
         const response = await this.imageRepository.save(avatar);
-        
 
         return response;
     }
 
     // delete image
-    async deleteAvatar(avatar: Partial<Image>): Promise<Http> {
+    async deleteAvatar(avatar: Partial<Image>): Promise<Image> {
         const image = await this.imageRepository.findOne({
             where: { uuid: avatar.uuid },
         });
-        if (!image) return createBadRequsetNoMess('Image not found');
-        if (image.public_id === null)
-            return createBadRequsetNoMess('Image is null');
+        if (!image) return null;
+        if (image.public_id === null) return null;
         await this.deleteImageFromCloud(image.public_id).catch((error) => {
             return createBadRequsetNoMess(error);
         });
-        await this.imageRepository.update(image.uuid, {
+        const reponse = await this.imageRepository.save({
+            ...image,
             public_id: null,
             url: null,
             secure_url: null,
         });
-        return createSuccessResponse(image, 'Delete image');
+        return reponse;
     }
 }

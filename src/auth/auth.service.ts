@@ -1,19 +1,20 @@
-import { ImageService } from './../modules/image/image.service';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User, UserRole } from 'src/entities';
 import { Repository } from 'typeorm';
+import { ImageService } from './../modules/image/image.service';
 import {
     LoginUserDto,
     RefreshTokenDto,
     RegisterAdminDTO,
     RegisterUserDTO,
 } from './dto';
+import { ChangePasswordDTO, UpdatePasswordDTO } from './dto/index';
 
-import { comparePassword, hashPassword } from 'src/utils/password';
 import { fakerVI } from '@faker-js/faker';
+import { comparePassword, hashPassword } from 'src/utils/password';
 
-import { JWTService } from 'src/configs';
+import { OAuth2Client } from 'google-auth-library';
 import {
     Http,
     createBadRequset,
@@ -21,9 +22,9 @@ import {
     createSuccessResponse,
     createUnAuthorized,
 } from 'src/common';
-import { GoogleLoginDTO } from './dto/GoogleLoginDTO';
-import { OAuth2Client } from 'google-auth-library';
+import { JWTService } from 'src/configs';
 import { GOOGLE_CLIENT_ID } from 'src/environment';
+import { GoogleLoginDTO } from './dto/GoogleLoginDTO';
 
 @Injectable()
 export class AuthService {
@@ -121,7 +122,7 @@ export class AuthService {
             emailIsExist.password
         );
 
-        console.log(isMatch)
+        console.log(isMatch);
         if (!isMatch) return createBadRequsetNoMess('Password is wrong!!');
 
         const device_token = loginUserDTO.device_token;
@@ -289,5 +290,46 @@ export class AuthService {
                 HttpStatus.UNAUTHORIZED
             );
         }
+    }
+
+    async updatePassword(
+        updatePasswordDTO: UpdatePasswordDTO
+    ): Promise<Http | undefined> {
+        const { email, password } = updatePasswordDTO;
+        const user = await this.userRepository.findOne({ where: { email } });
+        if (!user) return undefined;
+
+        const newPassword = await hashPassword(password);
+        if (!newPassword) return undefined;
+
+        const response = await this.userRepository.update(
+            { email: email },
+            { password: newPassword, isUpdatePassword: true }
+        );
+        if (!response) return undefined;
+
+        return createSuccessResponse(response, 'Update password is');
+    }
+
+    async changePassword(ChangePasswordDTO: ChangePasswordDTO): Promise<Http> {
+        const { email, oldPassword, newPassword } = ChangePasswordDTO;
+        const user = await this.userRepository.findOne({ where: { email } });
+        if (!user) return createBadRequsetNoMess('Not found email');
+        const isMatch = await comparePassword(oldPassword, user.password);
+
+        if (!isMatch) return createBadRequsetNoMess('Old password is wrong');
+
+        const hashNewPassword = await hashPassword(newPassword);
+
+        if (!hashNewPassword)
+            return createBadRequsetNoMess('Password is not hash');
+
+        const response = await this.userRepository.update(
+            { email: email },
+            { password: hashNewPassword, isUpdatePassword: true }
+        );
+        if (!response) return createBadRequsetNoMess('Something wrong!!');
+
+        return createSuccessResponse(response, 'Change password is');
     }
 }
