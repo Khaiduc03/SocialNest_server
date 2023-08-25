@@ -5,6 +5,8 @@ import {
     Column,
     Entity,
     JoinColumn,
+    JoinTable,
+    ManyToMany,
     ManyToOne,
     OneToMany,
     OneToOne,
@@ -39,15 +41,18 @@ export class News extends Base {
     @JoinColumn({ name: 'image_uuid', referencedColumnName: 'uuid' })
     image: Partial<Image>;
 
-
     @Expose()
     @ManyToOne(() => User, (user) => user.uuid)
     @JoinColumn({ name: 'owner', referencedColumnName: 'uuid' })
     owner: Partial<User>;
 
-    @Expose()
-    @Column({ type: 'simple-array', nullable: true })
-    topic: string[];
+    @ManyToMany(() => Topic)
+    @JoinTable({
+        name: 'news_topic_relation',
+        joinColumn: { name: 'news_uuid', referencedColumnName: 'uuid' },
+        inverseJoinColumn: { name: 'topic_uuid', referencedColumnName: 'uuid' },
+    })
+    topics: Partial<Topic[]>;
 
     constructor(news: Partial<News>) {
         super(); // call constructor of BaseEntity

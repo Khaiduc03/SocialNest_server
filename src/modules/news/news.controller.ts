@@ -18,6 +18,7 @@ import { Http } from 'src/common';
 import { AuthGuard } from 'src/core';
 import { CreateNewsDTO, UpdateNewsDTO, UuidDTO } from './dto';
 import { NewsService } from './news.service';
+import { News } from 'src/entities';
 
 @Controller('news')
 @UseGuards(AuthGuard)
@@ -27,7 +28,7 @@ export class NewsController {
     //crud news
     @Get()
     async getAllNews(): Promise<Http> {
-        return await this.newsService.getAllNews();
+        return await this.newsService.getAllNewsWithPage();
     }
 
     @Get('/id:uuid')
@@ -63,11 +64,14 @@ export class NewsController {
         return await this.newsService.deleteNews(user.uuid, uuid);
     }
 
+    @Get('test')
+    async getAllNewsByTopicName(): // @Param('topicName') topicName: string
+    Promise<any> {}
 
     @Get('dummy-news')
-    async dummyNews(@Req() req:Request): Promise<any> {
+    async dummyNews(@Req() req: Request): Promise<any> {
         const user = req['user'];
-       
-        return await this.newsService.createDummyNEews(user.uuid);
+       // console.log(user)
+        return await this.newsService.createDummyNEews(user);
     }
 }

@@ -7,7 +7,7 @@ import {
     createBadRequsetNoMess,
     createSuccessResponse,
 } from 'src/common';
-import { News, User } from 'src/entities';
+import { News, Topic, User } from 'src/entities';
 import { getRandomSubset } from 'src/utils';
 import { Repository } from 'typeorm';
 import { ImageService } from '../image';
@@ -22,7 +22,9 @@ export class NewsService {
         private readonly newsRepository: Repository<News>,
         private readonly imageService: ImageService,
         private readonly userService: UserService,
-        private readonly topicService: TopicService
+        private readonly topicService: TopicService,
+        @InjectRepository(Topic)
+        private topicRepository: Repository<Topic>
     ) {}
 
     //crud news
@@ -33,30 +35,37 @@ export class NewsService {
                 .leftJoinAndSelect('news.image', 'image')
                 .leftJoinAndSelect('news.owner', 'owner')
                 .leftJoinAndSelect('owner.avatar', 'avatar')
+                .leftJoinAndSelect('news.topics', 'topics')
                 .getMany();
 
             if (!news) return createBadRequset('Get news all');
 
-            // Trích xuất thông tin public_id và uuid của image
-            const imageUrl = news.map((news) => news.image.url);
-            const imageUuid = news.map((news) => news.image.uuid);
-
-            const ownerFullname = news.map((news) => news.owner);
-            const ownerAvatar = news.map((news) => news.owner.avatar.url);
-
-            imageUrl.forEach((imageUrl, index) => {
-                news[index].image = {
-                    uuid: imageUuid[index],
-                    url: imageUrl,
-                };
-                news[index].owner = {
-                    fullname: ownerFullname[index].fullname,
-                    avatar: {
-                        url: ownerAvatar[index],
-                    },
-                };
-            });
             return createSuccessResponse(news, 'Get news all');
+        } catch (error) {
+            return createBadRequsetNoMess(error);
+        }
+    }
+
+    async getAllNewsWithPage(page: number = 1): Promise<Http> {
+        try {
+            const perPage = 22;
+            const skip = (page - 1) * perPage;
+
+            const news = await this.newsRepository
+                .createQueryBuilder('news')
+                .leftJoinAndSelect('news.image', 'image')
+                .leftJoinAndSelect('news.owner', 'owner')
+                .leftJoinAndSelect('owner.avatar', 'avatar')
+                .leftJoinAndSelect('news.topics', 'topics')
+                .skip(skip) // Bỏ qua số lượng mục tương ứng với trang
+                .take(perPage) // Lấy số lượng mục trên mỗi trang
+                .getMany();
+
+            if (!news) return createBadRequset('Get news all');
+
+            await this.responseOfNews(news);
+
+            return createSuccessResponse(news.length, 'Get news all');
         } catch (error) {
             return createBadRequsetNoMess(error);
         }
@@ -80,10 +89,7 @@ export class NewsService {
         file: Express.Multer.File
     ): Promise<Http> {
         try {
-            const topics = await this.topicService.getTopicsByIds(
-                createNews.topic
-            );
-            const topicNames = topics.map((topic) => topic.name);
+            const topics = await this.topicService.getTopics();
 
             const image = await this.imageService.uploadImage(
                 file,
@@ -103,10 +109,9 @@ export class NewsService {
             const news = new News({
                 ...createNews,
                 owner: ownerInfo,
-                topic: topicNames,
                 image: image,
             });
-
+            news.topics = getRandomSubset(topics, 3);
             const reponse = await this.newsRepository.save(news);
             if (!reponse) return createBadRequset('create news');
             return createSuccessResponse(reponse, 'Create news successfully');
@@ -167,44 +172,29 @@ export class NewsService {
         return shuffledArray.slice(0, count);
     }
 
-    async createDummyNEews(user_uuid: string): Promise<any> {
+    async createDummyNEews(user: User): Promise<any> {
         const dummyNews = [];
         const topics = await this.topicService.getTopics();
-        const user = await this.userService.getUserByuuiId(user_uuid);
+
         for (let i = 0; i < 10; i++) {
-            const getTopicName = getRandomSubset(topics, 3).map(
-                (topic) => topic.name
-            );
             const image = await this.imageService.createDummyImage();
             const news = new News({
                 image: image,
                 title: fakerVI.lorem.sentence(),
                 body: fakerVI.lorem.paragraphs(),
-                topic: getTopicName,
                 owner: user,
             });
+            news.topics = getRandomSubset(topics, 3);
+
             dummyNews.push(news);
         }
 
         const response = await this.newsRepository.save(dummyNews);
-        const imageUrl = response.map((news) => news.image.url);
-        const imageUuid = response.map((news) => news.image.uuid);
 
-        imageUrl.forEach((imageUrl, index) => {
-            response[index].image = {
-                uuid: imageUuid[index],
-                url: imageUrl,
-            };
-            response[index].owner = {
-                fullname: user.fullname,
-                avatar: {
-                    url: user.avatar.url,
-                },
-            };
-        });
-
-        return createSuccessResponse(response, 'Create dummy news');
-
+        return createSuccessResponse(
+            `${response.length} was created`,
+            'Create dummy news'
+        );
     }
 
     async responseOfNews(news: News[]): Promise<News[]> {
@@ -213,6 +203,10 @@ export class NewsService {
 
         const ownerFullname = news.map((news) => news.owner);
         const ownerAvatar = news.map((news) => news.owner.avatar.url);
+
+        const topics: any = news.map((news) =>
+            news.topics.map((topic) => topic.name)
+        );
 
         imageUrl.forEach((imageUrl, index) => {
             news[index].image = {
@@ -225,7 +219,27 @@ export class NewsService {
                     url: ownerAvatar[index],
                 },
             };
+            news[index].topics = topics[index];
         });
         return news;
+    }
+
+    async getAllNewsByTopicName(): Promise<any> {
+        // const news = await this.newsRepository
+        //     .createQueryBuilder('news')
+        //     .leftJoinAndSelect('news.topics', 'topics')
+        //     .where('topics.name like :name', {
+        //         name: 'warvip3215431',
+        //     })
+        //     .getMany();
+        // console.log(news);
+        // return news;
+
+        const topic = await this.topicRepository.find({
+            relations: {
+                news: true,
+            },
+        });
+        return topic;
     }
 }
