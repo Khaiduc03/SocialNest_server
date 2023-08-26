@@ -3,9 +3,10 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Bookmark, News, User } from 'src/entities';
 import { Repository } from 'typeorm';
-import { UuidOfUserDTO } from './dto';
+import { CreateBookmarkDTO, UuidOfUserDTO } from './dto';
 import { getRandomSubset } from 'src/utils';
 import { randomInt } from 'crypto';
+import { th } from '@faker-js/faker';
 
 @Injectable()
 export class BookmarkService {
@@ -20,7 +21,6 @@ export class BookmarkService {
     // create dummy bookmark
     async createDummyBookmark(user: User): Promise<Bookmark[]> {
         const bookmarks: Bookmark[] = [];
-        const { uuid } = user;
 
         const news = await this.newsService.getAllNews();
         if (!news) return null;
@@ -41,7 +41,14 @@ export class BookmarkService {
     async getAllBookmarkOfUser(
         uuidOfUserDTO: UuidOfUserDTO
     ): Promise<Bookmark[]> {
-        const response = await this.bookmarkRepository.find();
+        const response = await this.bookmarkRepository.find({
+            where: {
+                user: {
+                    uuid: uuidOfUserDTO.user_uuid,
+                },
+            },
+            relations: ['news'],
+        });
         if (!response) return null;
         if (response.length === 0) return null;
 
@@ -51,6 +58,28 @@ export class BookmarkService {
     //get bookmark by id
 
     //create bookmark
+    async createBookMark(
+        createBookmarkDTO: CreateBookmarkDTO,
+        user: User
+    ): Promise<Bookmark> {
+        try {
+            const newItem = await this.newsService.getNewsById(
+                createBookmarkDTO.news_uuid
+            );
+            if (!newItem) return null;
+
+            const bookmark = new Bookmark({
+                user: user,
+            });
+            bookmark.news = newItem;
+            if (!bookmark) return null;
+            const response = await this.bookmarkRepository.save(bookmark);
+            if (!response) return null;
+            return response;
+        } catch (error) {
+            throw error;
+        }
+    }
 
     //update bookmark by id
 

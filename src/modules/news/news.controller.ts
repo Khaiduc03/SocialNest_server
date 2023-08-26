@@ -14,7 +14,7 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Request } from 'express';
-import { Http } from 'src/common';
+import { Http, createBadRequset, createSuccessResponse } from 'src/common';
 import { AuthGuard } from 'src/core';
 import { CreateNewsDTO, PageDTO, UpdateNewsDTO, UuidDTO } from './dto';
 import { NewsService } from './news.service';
@@ -32,7 +32,9 @@ export class NewsController {
 
     @Get('/id:uuid')
     async getNewsById(@Param('uuid') uuid: string): Promise<Http> {
-        return await this.newsService.getNewsById(uuid);
+        const response = await this.newsService.getNewsById(uuid);
+        if (!response) return createBadRequset('Get news by id');
+        return createSuccessResponse(response, 'Get news by id');
     }
 
     @Post()
@@ -70,7 +72,7 @@ export class NewsController {
     @Get('dummy-news')
     async dummyNews(@Req() req: Request): Promise<any> {
         const user = req['user'];
-         console.log(user)
-       // return await this.newsService.createDummyNEews(user);
+        console.log(user);
+        // return await this.newsService.createDummyNEews(user);
     }
 }

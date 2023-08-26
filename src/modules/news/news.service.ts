@@ -30,14 +30,7 @@ export class NewsService {
     //crud news
     async getAllNews(): Promise<News[]> {
         try {
-            const news = await this.newsRepository
-                .createQueryBuilder('news')
-                // .leftJoinAndSelect('news.image', 'image')
-                // .leftJoinAndSelect('news.owner', 'owner')
-                // .leftJoinAndSelect('owner.avatar', 'avatar')
-                // .leftJoinAndSelect('news.topics', 'topics')
-                .getMany();
-
+            const news = await this.newsRepository.find();
             if (!news) return null;
 
             return news;
@@ -68,21 +61,21 @@ export class NewsService {
 
             await this.responseOfNews(news);
 
-            return createSuccessResponse(news.length, 'Get news all');
+            return createSuccessResponse(news, 'Get news all');
         } catch (error) {
             return createBadRequsetNoMess(error);
         }
     }
 
-    async getNewsById(uuid: string): Promise<Http> {
+    async getNewsById(uuid: string): Promise<News> {
         try {
             const news = await this.newsRepository.findOne({
                 where: { uuid },
             });
-            if (!news) return createBadRequset('Get news by id');
-            return createSuccessResponse(news, 'Get news by id');
+            if (!news) return null;
+            return news;
         } catch {
-            return createBadRequset('Get news by id');
+            throw createBadRequset('Get news by id');
         }
     }
 
