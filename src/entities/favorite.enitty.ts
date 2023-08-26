@@ -20,16 +20,14 @@ import { News } from './news.entity';
 })
 export class Favorite extends Base {
     @Expose()
-    @OneToOne(() => User, (user) => user.uuid)
+    @ManyToOne(() => User, (user) => user.uuid)
     @JoinColumn({ name: 'user_uuid', referencedColumnName: 'uuid' })
     user_uuid: User;
 
     @Expose()
-    @OneToMany(() => News, (news) => news.uuid)
+    @ManyToOne(() => News, (news) => news.uuid)
     @JoinColumn({ name: 'news_uuid', referencedColumnName: 'uuid' })
     news_uuid: News;
-
-   
 
     constructor(favorite: Partial<Favorite>) {
         super();

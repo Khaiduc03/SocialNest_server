@@ -48,7 +48,7 @@ export class NewsService {
 
     async getAllNewsWithPage(page: number = 1): Promise<Http> {
         try {
-            const perPage = 22;
+            const perPage = 15;
             const skip = (page - 1) * perPage;
 
             const news = await this.newsRepository
@@ -57,8 +57,9 @@ export class NewsService {
                 .leftJoinAndSelect('news.owner', 'owner')
                 .leftJoinAndSelect('owner.avatar', 'avatar')
                 .leftJoinAndSelect('news.topics', 'topics')
-                .skip(skip) // Bỏ qua số lượng mục tương ứng với trang
-                .take(perPage) // Lấy số lượng mục trên mỗi trang
+                .skip(skip)
+                .take(perPage)
+                .orderBy('news.createdAt', 'DESC')
                 .getMany();
 
             if (!news) return createBadRequset('Get news all');

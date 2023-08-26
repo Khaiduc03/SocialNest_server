@@ -26,11 +26,16 @@ export class TopicController {
     }
 
     //get topic by id
-    @Get(':uuid')
+    @Get('id/:uuid')
     async getTopicById(@Param('uuid') uuid: string): Promise<Http> {
         const response = await this.topicService.getTopicById(uuid);
         if (!response) return createBadRequset('Get topic by id is fail!!');
         return createSuccessResponse(response, 'Get topic by id');
+    }
+
+    @Get('create-dummy-topic')
+    async createDummyTopic(): Promise<Http> {
+        return this.topicService.createDummyTopic();
     }
 
     //create topic

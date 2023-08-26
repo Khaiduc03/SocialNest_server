@@ -1,3 +1,4 @@
+import { fakerVI } from '@faker-js/faker';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
@@ -29,23 +30,22 @@ export class TopicService {
 
     async getTopics(): Promise<Topic[]> {
         const response = await this.topicRepository.find();
-        if (!response) return null
-        if (response.length === 0)
-            return null
+        if (!response) return null;
+        if (response.length === 0) return null;
 
         return response;
     }
 
     async getTopicById(uuid: string): Promise<Topic> {
-      const response = await this.topicRepository
-        .findOne({
-          where: { uuid: uuid + '' },
-        })
-        .catch((err) => {});
-  
-      if (!response) return null;
-  
-      return response;
+        const response = await this.topicRepository
+            .findOne({
+                where: { uuid: uuid + '' },
+            })
+            .catch((err) => {});
+
+        if (!response) return null;
+
+        return response;
     }
 
     // get topic by id
@@ -94,5 +94,28 @@ export class TopicService {
             .catch((err) => {});
 
         return createSuccessResponse(isExits, 'Delete topic');
+    }
+
+    async createDummyTopic() {
+        try {
+            const topics = [];
+            for (let i = 0; i < 10; i++) {
+                const topic = new Topic({
+                    name: fakerVI.lorem.words({min:1 , max: 1}),
+                });
+                topics.push(topic);
+            }
+            const response = await this.topicRepository.save(topics);
+      
+            if (!response) return createBadRequset('Create topic is fail!!');
+            return createSuccessResponse(
+                `${response.length} was created`,
+                'Create topic'
+            );
+        } catch (error) {
+            createBadRequsetNoMess(
+                'Something went wrong at create dummy topic: ' + error.message
+            );
+        }
     }
 }

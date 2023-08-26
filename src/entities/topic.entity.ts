@@ -1,11 +1,6 @@
 import { Expose, plainToClass } from 'class-transformer';
 import { uuids4 } from 'src/utils';
-import {
-    Column,
-    Entity,
-    JoinTable,
-    ManyToMany
-} from 'typeorm';
+import { Column, Entity, JoinTable, ManyToMany } from 'typeorm';
 import { Base } from './base';
 import { News } from './news.entity';
 import { User } from './user.entity';
@@ -34,7 +29,7 @@ export class Topic extends Base {
         if (topic) {
             Object.assign(
                 this,
-                plainToClass(User, topic, { excludeExtraneousValues: true })
+                plainToClass(Topic, topic, { excludeExtraneousValues: true })
             );
             this.uuid = topic.uuid || uuids4();
         }
