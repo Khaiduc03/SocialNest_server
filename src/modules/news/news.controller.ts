@@ -16,9 +16,8 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { Request } from 'express';
 import { Http } from 'src/common';
 import { AuthGuard } from 'src/core';
-import { CreateNewsDTO, UpdateNewsDTO, UuidDTO } from './dto';
+import { CreateNewsDTO, PageDTO, UpdateNewsDTO, UuidDTO } from './dto';
 import { NewsService } from './news.service';
-import { News } from 'src/entities';
 
 @Controller('news')
 @UseGuards(AuthGuard)
@@ -27,8 +26,8 @@ export class NewsController {
 
     //crud news
     @Get()
-    async getAllNews(): Promise<Http> {
-        return await this.newsService.getAllNewsWithPage();
+    async getAllNews(@Body() pageDTO: PageDTO): Promise<Http> {
+        return await this.newsService.getAllNewsWithPage(pageDTO);
     }
 
     @Get('/id:uuid')
@@ -71,7 +70,7 @@ export class NewsController {
     @Get('dummy-news')
     async dummyNews(@Req() req: Request): Promise<any> {
         const user = req['user'];
-       // console.log(user)
-        return await this.newsService.createDummyNEews(user);
+         console.log(user)
+       // return await this.newsService.createDummyNEews(user);
     }
 }

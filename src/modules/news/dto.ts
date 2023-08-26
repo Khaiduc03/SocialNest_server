@@ -32,9 +32,13 @@ export class UpdateStatusNewsDTO {
     status: string;
 }
 
-export class  UuidDTO {
+export class UuidDTO {
     @IsNotEmpty()
     @IsUUID()
     uuid: string;
 }
 
+export class PageDTO {
+    @IsNotEmpty()
+    page: number = 1;
+}

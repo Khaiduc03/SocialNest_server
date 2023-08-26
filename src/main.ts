@@ -3,7 +3,7 @@ import { Logger, ValidationPipe } from '@nestjs/common';
 
 import { AppModule } from './app.module';
 import { NODE_ENV, PORT } from './environment';
-import { TimeoutInterceptor } from './core';
+import { LoggingInterceptor, TimeoutInterceptor } from './core';
 import { LoggerMiddleware } from './core/middlewares';
 // import { LoggerMiddleware, TimeoutInterceptor } from './core';
 
@@ -18,7 +18,10 @@ async function bootstrap() {
 
     app.use(LoggerMiddleware);
 
-    app.useGlobalInterceptors(new TimeoutInterceptor());
+    app.useGlobalInterceptors(
+        new TimeoutInterceptor(),
+      
+    );
 
     app.useGlobalPipes(new ValidationPipe());
 

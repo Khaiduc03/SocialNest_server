@@ -11,8 +11,26 @@ import { UserService } from '../user';
 import { CloudService } from '../cloud';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([News,User,Image,Topic])],
-  providers: [NewsService, JWTService,JwtService, ImageService, TopicService,UserService, CloudService],
-  controllers: [NewsController],
+    imports: [TypeOrmModule.forFeature([News, User, Image, Topic])],
+    providers: [
+        NewsService,
+        JWTService,
+        JwtService,
+        ImageService,
+        TopicService,
+        UserService,
+        CloudService,
+    ],
+    controllers: [NewsController],
+    exports: [
+        NewsService,
+        JWTService,
+        JwtService,
+        ImageService,
+        TopicService,
+        UserService,
+        CloudService,
+      //  TypeOrmModule.forFeature([News, User, Image, Topic]),
+    ],
 })
 export class NewsModule {}

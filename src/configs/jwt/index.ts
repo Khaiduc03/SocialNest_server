@@ -13,7 +13,6 @@ export type JWTPayload = {
     [key: string]: any;
     uuid: string;
     roles: UserRole;
- 
 };
 
 type Token = 'access' | 'refresh';
@@ -56,7 +55,6 @@ export class JWTService {
             };
             try {
                 const payload = this.jwtService.verify(token, options);
-                //console.log(payload)
                 resolve(payload);
             } catch (error: any) {
                 reject(error);

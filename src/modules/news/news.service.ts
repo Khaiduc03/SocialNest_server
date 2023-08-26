@@ -13,7 +13,7 @@ import { Repository } from 'typeorm';
 import { ImageService } from '../image';
 import { TopicService } from '../topic';
 import { UserService } from '../user/user.service';
-import { CreateNewsDTO, UpdateNewsDTO, UuidDTO } from './dto';
+import { CreateNewsDTO, PageDTO, UpdateNewsDTO, UuidDTO } from './dto';
 
 @Injectable()
 export class NewsService {
@@ -28,26 +28,28 @@ export class NewsService {
     ) {}
 
     //crud news
-    async getAllNews(): Promise<Http> {
+    async getAllNews(): Promise<News[]> {
         try {
             const news = await this.newsRepository
                 .createQueryBuilder('news')
-                .leftJoinAndSelect('news.image', 'image')
-                .leftJoinAndSelect('news.owner', 'owner')
-                .leftJoinAndSelect('owner.avatar', 'avatar')
-                .leftJoinAndSelect('news.topics', 'topics')
+                // .leftJoinAndSelect('news.image', 'image')
+                // .leftJoinAndSelect('news.owner', 'owner')
+                // .leftJoinAndSelect('owner.avatar', 'avatar')
+                // .leftJoinAndSelect('news.topics', 'topics')
                 .getMany();
 
-            if (!news) return createBadRequset('Get news all');
+            if (!news) return null;
 
-            return createSuccessResponse(news, 'Get news all');
+            return news;
         } catch (error) {
-            return createBadRequsetNoMess(error);
+            throw new error.message();
         }
     }
 
-    async getAllNewsWithPage(page: number = 1): Promise<Http> {
+    async getAllNewsWithPage(pageDTO: PageDTO): Promise<Http> {
         try {
+            const page = pageDTO.page;
+
             const perPage = 15;
             const skip = (page - 1) * perPage;
 

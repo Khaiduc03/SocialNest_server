@@ -22,12 +22,12 @@ export class Bookmark extends Base {
     @Expose()
     @ManyToOne(() => User, (user) => user.uuid)
     @JoinColumn({ name: 'user_uuid', referencedColumnName: 'uuid' })
-    user_uuid: User;
+    user: Partial<User>;
 
     @Expose()
     @ManyToOne(() => News, (news) => news.uuid)
     @JoinColumn({ name: 'news_uuid', referencedColumnName: 'uuid' })
-    news_uuid: News;
+    news: News;
 
     constructor(bookmark: Partial<Bookmark>) {
         super();
