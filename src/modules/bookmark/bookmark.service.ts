@@ -69,6 +69,7 @@ export class BookmarkService {
             if (!newItem) return null;
 
             const bookmark = new Bookmark({
+                
                 user: user,
             });
             bookmark.news = newItem;

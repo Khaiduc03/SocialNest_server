@@ -7,8 +7,6 @@ export class CreateNewsDTO {
     @IsNotEmpty()
     body: string;
 
-    // @IsNotEmpty()
-    // topic: string[];
 }
 
 export class UpdateNewsDTO {

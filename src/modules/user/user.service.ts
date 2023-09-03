@@ -144,7 +144,6 @@ export class UserService {
         const deleted = await this.imageService.deleteAvatar(isExist.avatar);
 
         if (!deleted) return createBadRequset('Delete avatar');
-        //console.log(deleted);
         return createSuccessResponse(deleted, 'Delete avatar');
     }
 

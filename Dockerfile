@@ -1,7 +1,7 @@
 FROM node:18.16.0-alpine as builder
 WORKDIR /app
 COPY ["package.json", "yarn.lock", "tsconfig.*", "nest-cli.json", "src", "./"]
-COPY . ./
+
 RUN yarn
 RUN yarn build
 

@@ -1,39 +1,36 @@
-import { Expose } from 'class-transformer'
-import { IsEmail, IsEmpty } from 'class-validator'
+import { Expose } from 'class-transformer';
+import { IsEmail, IsNotEmpty } from 'class-validator';
 
-export * from './LoginUser.dto'
-export * from './RegisterUser.dto'
-export * from './RegisterAdmin.dto'
-export * from './RefreshToken.dto'
+export * from './LoginUser.dto';
+export * from './RefreshToken.dto';
+export * from './RegisterAdmin.dto';
+export * from './RegisterUser.dto';
 
 export class UpdatePasswordDTO {
     @Expose()
-    @IsEmpty()
+    @IsNotEmpty()
     @IsEmail()
-    email: string
+    email: string;
 
     @Expose()
-    @IsEmpty()
+    @IsNotEmpty()
     @IsEmail()
-    password: string
-
+    password: string;
 }
 
 export class ChangePasswordDTO {
     @Expose()
-    @IsEmpty()
+    @IsNotEmpty()
     @IsEmail()
-    email: string
+    email: string;
 
     @Expose()
-    @IsEmpty()
+    @IsNotEmpty()
     @IsEmail()
-    oldPassword: string
+    oldPassword: string;
 
     @Expose()
-    @IsEmpty()
+    @IsNotEmpty()
     @IsEmail()
-    newPassword: string
-
+    newPassword: string;
 }
-
