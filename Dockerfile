@@ -1,19 +1,19 @@
 FROM node:18.16.0-alpine as builder
 WORKDIR /app
-COPY ["package.json", "yarn.lock", "tsconfig.*", "nest-cli.json", "src", "./"]
-
-RUN yarn
+COPY . .
+RUN yarn install
 RUN yarn build
-
 
 FROM node:18.16.0-alpine
 WORKDIR /app
-COPY --from=builder /app/package.json /app/dist ./
+COPY --from=builder /app/package.json /app/dist dist/
 COPY --from=builder /app/node_modules ./node_modules
+COPY .env.production /app/.env
+
 CMD ["node", "dist/main"]
 
 
-# node version
+# # node version
 # FROM node:18.16.0-alpine
 
 # # set working directory

@@ -253,10 +253,12 @@ export class AuthService {
                     avatar: await this.imageService.createImage(
                         payload.picture
                     ),
+                    isUpdate: true,
+                    isUpdatePassword: false,
                 });
                 await this.userRepository.update(
                     { email: email },
-                    { device_token: device_token, isUpdate: true, status: true }
+                    { device_token: device_token, status: true }
                 );
                 await this.userRepository.save(user);
             }

@@ -9,10 +9,10 @@ import {
     createSuccessResponse,
 } from 'src/common';
 
+import { fakerVI } from '@faker-js/faker';
+import { Image } from 'src/entities';
 import { Repository } from 'typeorm';
 import { CloudService } from '../cloud';
-import { faker, fakerVI } from '@faker-js/faker';
-import { Image } from 'src/entities';
 @Injectable()
 export class ImageService {
     constructor(

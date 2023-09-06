@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { TypeOrmModuleOptions, TypeOrmOptionsFactory } from '@nestjs/typeorm';
 import {
+    NODE_ENV,
     POSTGRES_DB,
     POSTGRES_HOST,
     POSTGRES_PASSWORD,
@@ -23,6 +24,7 @@ export class TypeOrmService implements TypeOrmOptionsFactory {
             autoLoadEntities: true,
             synchronize: true,
             entities: [__dirname + '/**/*.entity{.ts,.js}'],
+            ssl:NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
            
         };
     }
